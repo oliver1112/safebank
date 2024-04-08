@@ -34,11 +34,6 @@ func NewUserHandler(svc *service.UserService) *UserHandler {
 }
 
 func (u *UserHandler) RegisterRoutes(server *gin.Engine) {
-	// REST 风格
-	//server.POST("/user", u.SignUp)
-	//server.PUT("/user", u.SignUp)
-	//server.GET("/users/:username", u.Profile)
-
 	ug := server.Group("/users")
 	// POST /users/signup
 	ug.POST("/signup", u.SignUp)
@@ -66,11 +61,11 @@ func (u *UserHandler) SignUp(ctx *gin.Context) {
 	//check user signup valid logic
 	isEmail, err := u.emailRexExp.MatchString(req.Email)
 	if err != nil {
-		ctx.String(http.StatusOK, "系统错误")
+		ctx.String(http.StatusOK, "system error")
 		return
 	}
 	if !isEmail {
-		ctx.String(http.StatusOK, "非法邮箱格式")
+		ctx.String(http.StatusOK, "invalid email")
 		return
 	}
 
@@ -81,11 +76,11 @@ func (u *UserHandler) SignUp(ctx *gin.Context) {
 
 	isPassword, err := u.passwordRexExp.MatchString(req.Password)
 	if err != nil {
-		ctx.String(http.StatusOK, "系统错误")
+		ctx.String(http.StatusOK, "system error")
 		return
 	}
 	if !isPassword {
-		ctx.String(http.StatusOK, "密码必须包含字母、数字、特殊字符，并且不少于八位")
+		ctx.String(http.StatusOK, "Password must contain letters, numbers, special characters, and be no less than eight characters")
 		return
 	}
 

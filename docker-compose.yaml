@@ -7,8 +7,8 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: root
     volumes:
-      #      - 初始化脚本
+      #      - Initialization of script
       - ./script/mysql/:/docker-entrypoint-initdb.d/
     ports:
-      #      - 外部访问用 13318
+      #      - For external access 13318
       - 13318:3306
