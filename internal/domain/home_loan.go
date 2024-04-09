@@ -1,14 +1,8 @@
-package dao
-
-import "gorm.io/gorm"
-
-type HomeLoanDAO struct {
-	db *gorm.DB
-}
+package domain
 
 type HomeLoan struct {
-	AccountID int64 `gorm:"primaryKey"`
-	Loan      Loan  `gorm:"foreignKey:AccountID"`
+	LoanID int64 //`gorm:"primaryKey"`
+	Loan   Loan  //`gorm:"foreignKey:AccountID"`
 
 	BuildYear    int
 	InsurAccNum  int

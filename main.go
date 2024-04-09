@@ -58,8 +58,8 @@ func initUser(db *gorm.DB) *web.UserHandler {
 }
 
 func initDB() *gorm.DB {
-	//change local host to 43.130.62.214
-	db, err := gorm.Open(mysql.Open("root:root@tcp(localhost:13318)/safebank"))
+	//change localhost to 43.130.62.214
+	db, err := gorm.Open(mysql.Open("root:root@tcp(43.130.62.214:13318)/safebank"))
 	if err != nil {
 		panic(err)
 	}

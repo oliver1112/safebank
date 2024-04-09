@@ -33,6 +33,10 @@ func (r *UserRepository) FindByEmail(ctx context.Context, email string) (domain.
 	}, nil
 }
 
+func (r *UserRepository) FindUserByUserID(userID int64) domain.User {
+	return domain.User{}
+}
+
 func (r *UserRepository) Create(ctx context.Context, u domain.User) error {
 	return r.dao.Insert(ctx, dao.User{
 		Email:    u.Email,

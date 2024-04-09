@@ -139,11 +139,31 @@ func (u *UserHandler) Edit(ctx *gin.Context) {
 
 func (u *UserHandler) Profile(ctx *gin.Context) {
 
+	sess := sessions.Default(ctx)
+	id := sess.Get("userId")
+
+	if id == nil {
+		ctx.AbortWithStatus(http.StatusUnauthorized)
+		return
+	}
+
+	userID, ok := id.(int64)
+	if !ok {
+		ctx.String(http.StatusOK, "session error")
+		return
+	}
+
+	//println(useID)
+	userData, err := u.svc.GetProfile(userID)
+	if err != nil {
+		ctx.String(http.StatusOK, "no such user")
+		return
+	}
+
 	responseData := gin.H{
 		"status": 0,
-		"data": gin.H{
-			"name": "Oliver",
-		},
+		// "data": userData
+		"data":   userData,
 		"errmsg": "",
 	}
 

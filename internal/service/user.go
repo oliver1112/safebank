@@ -2,7 +2,9 @@ package service
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
+	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
 	"safebank/internal/domain"
 	"safebank/internal/repository"
@@ -12,12 +14,19 @@ var ErrUserDuplicateEmail = repository.ErrUserDuplicateEmail
 var ErrInvalidUserOrPassword = errors.New("email or password is wrong")
 
 type UserService struct {
-	repo *repository.UserRepository
+	userRepo    *repository.UserRepository
+	accountRepo *repository.AccRepository
 }
 
 func NewUserService(repo *repository.UserRepository) *UserService {
 	return &UserService{
-		repo: repo,
+		userRepo: repo,
+	}
+}
+
+func NewAccService(repo *repository.UserRepository) *UserService {
+	return &UserService{
+		userRepo: repo,
 	}
 }
 
@@ -28,12 +37,12 @@ func (svc *UserService) SignUp(ctx context.Context, u domain.User) error {
 	}
 	u.Password = string(hash)
 
-	return svc.repo.Create(ctx, u)
+	return svc.userRepo.Create(ctx, u)
 }
 
 func (svc *UserService) Login(ctx context.Context, email, password string) (domain.User, error) {
 	// find the user
-	u, err := svc.repo.FindByEmail(ctx, email)
+	u, err := svc.userRepo.FindByEmail(ctx, email)
 	if err == repository.ErrUserNotFound {
 		return domain.User{}, ErrInvalidUserOrPassword
 	}
@@ -50,4 +59,39 @@ func (svc *UserService) Login(ctx context.Context, email, password string) (doma
 	}
 
 	return u, nil
+}
+
+func (svc *UserService) GetProfile(userID int64) (gin.H, error) {
+
+	//savingAcc := FindSavingByUserID(userID)
+	//checkingAcc := FindCheckingByUserID(userID)
+	//loanAcc := FindLoanAccByUserID(userID)
+	//studentLoanAcc := FindStudentLoanByUserID(userID)
+	//homeLoanAcc := FindHomeLoanByUserID(userID)
+
+	//return gin.H{
+	//
+	//
+	//	"Account" : gin.H{
+	//		"savingAcc":      savingAcc,
+	//		"checkingAcc":    checkingAcc,
+	//		"loanAcc":        loanAcc,
+	//		"studentLoanAcc": studentLoanAcc,
+	//		"homeLoanAcc":    homeLoanAcc,
+	//	},
+	//}, nil
+
+	user := svc.userRepo.FindUserByUserID(userID)
+	jsonData, _ := json.Marshal(user)
+
+	//for _, account := range user.Account {
+	//	if account.AccountType == "S": {
+	//		saving := svc.accountRepo.FindSavingByAccID(account.ID)
+	//	} else if account.AccountType == "C": {
+	//		checking := svc.accountRepo.FindCheckByAccID(account.ID)
+	//	} else if
+	//}
+
+	return gin.H{"data": string(jsonData)}, nil
+
 }

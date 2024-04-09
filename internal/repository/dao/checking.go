@@ -10,4 +10,5 @@ type Checking struct {
 	AccountID     int `gorm:"primaryKey"`
 	Account       Account
 	ServiceCharge float64
+	Amount        int64
 }

@@ -10,4 +10,5 @@ type Saving struct {
 	AccountID    int `gorm:"primaryKey"`
 	Account      Account
 	InterestRate float64
+	Amount       float64
 }
