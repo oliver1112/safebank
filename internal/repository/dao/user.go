@@ -49,7 +49,7 @@ func (ud *UserDAO) Insert(ctx context.Context, u User) error {
 
 // User is the mapping to database form, also called entity, model, PO(persistent object)
 type User struct {
-	Id      int64  `gorm:"primaryKey,autoIncrement"`
+	ID      int64  `gorm:"primaryKey,autoIncrement"`
 	Email   string `gorm:"unique"`
 	FName   string
 	LName   string

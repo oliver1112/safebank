@@ -7,7 +7,7 @@ type AccountDAO struct {
 }
 
 type Account struct {
-	Id   int64 `gorm:"primaryKey,autoIncrement"`
+	ID   int64 `gorm:"primaryKey,autoIncrement"`
 	name string
 
 	Street      string
@@ -15,7 +15,7 @@ type Account struct {
 	State       string
 	Zip         string
 	AccountType string
-	UserId      int
+	UserID      int64
 
 	Ctime int64
 	Utime int64
