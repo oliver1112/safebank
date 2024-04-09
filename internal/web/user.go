@@ -126,7 +126,7 @@ func (u *UserHandler) Login(ctx *gin.Context) {
 
 	// Login success and set session
 	sess := sessions.Default(ctx)
-	sess.Set("userId", user.Id)
+	sess.Set("userId", user.ID)
 	sess.Save()
 	ctx.String(http.StatusOK, "Login Success")
 
@@ -139,5 +139,14 @@ func (u *UserHandler) Edit(ctx *gin.Context) {
 
 func (u *UserHandler) Profile(ctx *gin.Context) {
 
-	ctx.String(http.StatusOK, "This is your profile")
+	responseData := gin.H{
+		"status": 0,
+		"data": gin.H{
+			"name": "Oliver",
+		},
+		"errmsg": "",
+	}
+
+	// Return JSON response
+	ctx.JSON(200, responseData)
 }
