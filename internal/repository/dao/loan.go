@@ -7,7 +7,7 @@ type LoanDAO struct {
 }
 
 type Loan struct {
-	AccountID int `gorm:"primaryKey"`
+	AccountID int64 `gorm:"primaryKey"`
 	Account   Account
 	Rate      float64
 	Amount    float64

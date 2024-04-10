@@ -1,8 +1,8 @@
 package domain
 
 type StuLoan struct {
-	LoanID int64 //`gorm:"primaryKey"`
-	Loan   Loan  //`gorm:"foreignKey:AccountID"`
+	LoanID int64
+	Loan   Loan
 
 	EduInstitute    string
 	StudentID       int

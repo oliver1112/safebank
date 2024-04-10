@@ -7,7 +7,7 @@ type SavingDAO struct {
 }
 
 type Saving struct {
-	AccountID    int `gorm:"primaryKey"`
+	AccountID    int64 `gorm:"primaryKey"`
 	Account      Account
 	InterestRate float64
 	Amount       float64

@@ -7,8 +7,8 @@ type HomeLoanDAO struct {
 }
 
 type HomeLoan struct {
-	AccountID int64 `gorm:"primaryKey"`
-	Loan      Loan  `gorm:"foreignKey:AccountID"`
+	LoanID int64 `gorm:"primaryKey"`
+	Loan   Loan  //`gorm:"foreignKey:AccountID"`
 
 	BuildYear    int
 	InsurAccNum  int

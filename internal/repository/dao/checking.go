@@ -7,7 +7,7 @@ type CheckingDAO struct {
 }
 
 type Checking struct {
-	AccountID     int `gorm:"primaryKey"`
+	AccountID     int64 `gorm:"primaryKey"`
 	Account       Account
 	ServiceCharge float64
 	Amount        int64

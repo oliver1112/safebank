@@ -1,7 +1,7 @@
 package domain
 
 type Loan struct {
-	AccountID int //`gorm:"primaryKey"`
+	AccountID int64
 	Account   Account
 	Rate      float64
 	Amount    float64

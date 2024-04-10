@@ -1,8 +1,8 @@
 package domain
 
 type HomeLoan struct {
-	LoanID int64 //`gorm:"primaryKey"`
-	Loan   Loan  //`gorm:"foreignKey:AccountID"`
+	LoanID int64
+	Loan   Loan
 
 	BuildYear    int
 	InsurAccNum  int

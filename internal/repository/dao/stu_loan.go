@@ -8,7 +8,7 @@ type StuLoanDAO struct {
 
 type StuLoan struct {
 	LoanID int64 `gorm:"primaryKey"`
-	Loan   Loan
+	Loan   Loan  //`gorm:"foreignKey:AccountID"`
 
 	EduInstitute    string
 	StudentID       int

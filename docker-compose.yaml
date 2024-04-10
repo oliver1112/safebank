@@ -11,4 +11,4 @@ services:
       - ./script/mysql/:/docker-entrypoint-initdb.d/
     ports:
       #      - For external access 13318
-      - 13318:3306
+      - 13319:3306
