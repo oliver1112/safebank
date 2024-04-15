@@ -170,3 +170,29 @@ func (u *UserHandler) Profile(ctx *gin.Context) {
 	// Return JSON response
 	ctx.JSON(200, responseData)
 }
+
+func (u *UserHandler) AddSaving(ctx *gin.Context) {
+	type SavingReq struct {
+		Email string `json:""`
+	}
+
+	var req SavingReq
+	if err := ctx.Bind(&req); err != nil {
+		return
+	}
+
+	sess := sessions.Default(ctx)
+	id := sess.Get("userId")
+
+	if id == nil {
+		ctx.AbortWithStatus(http.StatusUnauthorized)
+		return
+	}
+
+	userID, ok := id.(int64)
+	if !ok {
+		ctx.String(http.StatusOK, "session error")
+		return
+	}
+
+}

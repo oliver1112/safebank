@@ -41,5 +41,14 @@ func (r *UserRepository) Create(ctx context.Context, u domain.User) error {
 	return r.dao.Insert(ctx, dao.User{
 		Email:    u.Email,
 		Password: u.Password,
+		FName:    u.FName,
+		LName:    u.LName,
+		Country:  u.Country,
+
+		State:  u.State,
+		City:   u.City,
+		Street: u.Street,
+		Apart:  u.Apart,
+		Zip:    u.Zip,
 	})
 }

@@ -1,6 +1,9 @@
 package dao
 
-import "gorm.io/gorm"
+import (
+	"context"
+	"gorm.io/gorm"
+)
 
 type SavingDAO struct {
 	db *gorm.DB
@@ -11,4 +14,9 @@ type Saving struct {
 	Account      Account
 	InterestRate float64
 	Amount       float64
+}
+
+func (sd *SavingDAO) Insert(ctx context.Context, s Saving) error {
+	err := sd.db.WithContext(ctx).Create(&s).Error
+	return err
 }

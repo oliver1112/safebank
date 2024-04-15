@@ -1,6 +1,9 @@
 package dao
 
-import "gorm.io/gorm"
+import (
+	"context"
+	"gorm.io/gorm"
+)
 
 type CheckingDAO struct {
 	db *gorm.DB
@@ -11,4 +14,9 @@ type Checking struct {
 	Account       Account
 	ServiceCharge float64
 	Amount        int64
+}
+
+func (sd *CheckingDAO) Insert(ctx context.Context, c Checking) error {
+	err := sd.db.WithContext(ctx).Create(&c).Error
+	return err
 }
