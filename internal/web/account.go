@@ -7,6 +7,8 @@ import (
 	"github.com/spf13/cast"
 	"gorm.io/gorm"
 	"math/rand"
+	"net/http"
+	"safebank/internal/domain"
 	"safebank/internal/repository/dao"
 	"safebank/internal/service"
 )
@@ -38,9 +40,14 @@ func (a *AccountHandler) CreateOrUpdateSavingAccount(ctx *gin.Context) {
 		City    string `json:"city"`
 		Zip     string `json:"zip"`
 	}
-
+	var responseData interface{}
 	var req Req
 	if err := ctx.Bind(&req); err != nil {
+		ctx.JSON(http.StatusOK, domain.Response{
+			Status:   1,
+			ErrorMsg: "Args error",
+			Data:     responseData,
+		})
 		return
 	}
 
@@ -68,9 +75,20 @@ func (a *AccountHandler) CreateOrUpdateSavingAccount(ctx *gin.Context) {
 		UserID:      cast.ToInt64(id),
 	}
 
-	account, _ := a.svc.AccountDao.CreateOrUpdate(ctx, data)
+	account, err := a.svc.AccountDao.CreateOrUpdate(ctx, data)
+	if err != nil {
+		ctx.JSON(http.StatusOK, domain.Response{
+			Status:   2,
+			ErrorMsg: "db error",
+			Data:     responseData,
+		})
+	}
 
-	fmt.Printf("%v", account)
+	ctx.JSON(http.StatusOK, domain.Response{
+		Status:   0,
+		ErrorMsg: "",
+		Data:     account,
+	})
 }
 
 func (a *AccountHandler) CreateOrUpdateCheckingAccount(ctx *gin.Context) {

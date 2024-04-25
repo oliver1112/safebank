@@ -40,7 +40,8 @@ func initWebServer() *gin.Engine {
 			if strings.HasPrefix(origin, "http://localhost") {
 				return true
 			}
-			return strings.Contains(origin, "yourcompany.com")
+			//return strings.Contains(origin, "yourcompany.com")
+			return true
 		},
 		MaxAge: 12 * time.Hour,
 	}))

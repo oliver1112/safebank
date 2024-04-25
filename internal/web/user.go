@@ -51,6 +51,7 @@ func (u *UserHandler) SignUp(ctx *gin.Context) {
 		ConfirmPassword string `json:"confirmPassword"`
 		Password        string `json:"password"`
 	}
+	var responseData interface{}
 
 	//receive request
 	var req SignUpReq
@@ -61,26 +62,46 @@ func (u *UserHandler) SignUp(ctx *gin.Context) {
 	//check user signup valid logic
 	isEmail, err := u.emailRexExp.MatchString(req.Email)
 	if err != nil {
-		ctx.String(http.StatusOK, "system error")
+		ctx.JSON(http.StatusOK, domain.Response{
+			Status:   1,
+			ErrorMsg: "system error",
+			Data:     responseData,
+		})
 		return
 	}
 	if !isEmail {
-		ctx.String(http.StatusOK, "invalid email")
+		ctx.JSON(http.StatusOK, domain.Response{
+			Status:   2,
+			ErrorMsg: "invalid email",
+			Data:     responseData,
+		})
 		return
 	}
 
 	if req.ConfirmPassword != req.Password {
-		ctx.String(http.StatusOK, "the password is not the same")
+		ctx.JSON(http.StatusOK, domain.Response{
+			Status:   3,
+			ErrorMsg: "the password is not the same",
+			Data:     responseData,
+		})
 		return
 	}
 
 	isPassword, err := u.passwordRexExp.MatchString(req.Password)
 	if err != nil {
-		ctx.String(http.StatusOK, "system error")
+		ctx.JSON(http.StatusOK, domain.Response{
+			Status:   4,
+			ErrorMsg: "system error",
+			Data:     responseData,
+		})
 		return
 	}
 	if !isPassword {
-		ctx.String(http.StatusOK, "Password must contain letters, numbers, special characters, and be no less than eight characters")
+		ctx.JSON(http.StatusOK, domain.Response{
+			Status:   5,
+			ErrorMsg: "Password must contain letters, numbers, special characters, and be no less than eight characters",
+			Data:     responseData,
+		})
 		return
 	}
 
@@ -91,15 +112,27 @@ func (u *UserHandler) SignUp(ctx *gin.Context) {
 	})
 
 	if err == service.ErrUserDuplicateEmail {
-		ctx.String(http.StatusOK, "email conflict")
+		ctx.JSON(http.StatusOK, domain.Response{
+			Status:   6,
+			ErrorMsg: "email conflict",
+			Data:     responseData,
+		})
 		return
 	}
 
 	if err != nil {
-		ctx.String(http.StatusOK, "system error")
+		ctx.JSON(http.StatusOK, domain.Response{
+			Status:   7,
+			ErrorMsg: "system error",
+			Data:     responseData,
+		})
 	}
 
-	ctx.String(http.StatusOK, "register success")
+	ctx.JSON(http.StatusOK, domain.Response{
+		Status:   0,
+		ErrorMsg: "",
+		Data:     responseData,
+	})
 	fmt.Printf("%v", req)
 }
 
@@ -108,7 +141,7 @@ func (u *UserHandler) Login(ctx *gin.Context) {
 		Email    string `json:"email"`
 		Password string `json:"password"`
 	}
-
+	var responseData interface{}
 	var req loginReq
 	if err := ctx.Bind(&req); err != nil {
 		return
@@ -116,11 +149,19 @@ func (u *UserHandler) Login(ctx *gin.Context) {
 
 	user, err := u.svc.Login(ctx, req.Email, req.Password)
 	if err == service.ErrInvalidUserOrPassword {
-		ctx.String(http.StatusOK, "wrong email or password")
+		ctx.JSON(http.StatusOK, domain.Response{
+			Status:   1,
+			ErrorMsg: "wrong email or password",
+			Data:     responseData,
+		})
 		return
 	}
 	if err != nil {
-		ctx.String(http.StatusOK, "system error")
+		ctx.JSON(http.StatusOK, domain.Response{
+			Status:   2,
+			ErrorMsg: "system error",
+			Data:     responseData,
+		})
 		return
 	}
 
@@ -128,7 +169,11 @@ func (u *UserHandler) Login(ctx *gin.Context) {
 	sess := sessions.Default(ctx)
 	sess.Set("userId", user.ID)
 	sess.Save()
-	ctx.String(http.StatusOK, "Login Success")
+	ctx.JSON(http.StatusOK, domain.Response{
+		Status:   0,
+		ErrorMsg: "",
+		Data:     responseData,
+	})
 
 	return
 }

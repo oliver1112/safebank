@@ -52,7 +52,6 @@ func (svc *AccountService) GetAccount(ctx *gin.Context) ([]dao.Account, error) {
 func (svc *AccountService) CreateOrUpdateAccount(ctx *gin.Context, data interface{}) ([]dao.Account, error) {
 	session := sessions.Default(ctx)
 	id := session.Get("userId")
-	idInt64 := cast.ToInt64(id)
-	accounts, err := svc.AccountDao.GetAccount(ctx, idInt64)
+	accounts, err := svc.AccountDao.GetAccount(ctx, cast.ToInt64(id))
 	return accounts, err
 }
