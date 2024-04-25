@@ -1,6 +1,7 @@
 package web
 
 import (
+	"errors"
 	"fmt"
 	regexp "github.com/dlclark/regexp2"
 	"github.com/gin-contrib/sessions"
@@ -50,6 +51,14 @@ func (u *UserHandler) SignUp(ctx *gin.Context) {
 		Email           string `json:"email"`
 		ConfirmPassword string `json:"confirmPassword"`
 		Password        string `json:"password"`
+		FirstName       string `json:"firstName"`
+		LastName        string `json:"lastName"`
+		Street          string `json:"address"`
+		Apart           string `json:"address2"`
+		Country         string `json:"country"`
+		State           string `json:"state"`
+		City            string `json:"city"`
+		Zip             string `json:"zip"`
 	}
 	var responseData interface{}
 
@@ -104,7 +113,7 @@ func (u *UserHandler) SignUp(ctx *gin.Context) {
 	if !isPassword {
 		ctx.JSON(http.StatusOK, domain.Response{
 			Status:   5,
-			ErrorMsg: "Password must contain letters, numbers, special characters, and be no less than eight characters",
+			ErrorMsg: "Password must contain lower letters, upper letters, numbers and special characters, and be no less than eight characters",
 			Data:     responseData,
 		})
 		return
@@ -114,9 +123,17 @@ func (u *UserHandler) SignUp(ctx *gin.Context) {
 	err = u.svc.SignUp(ctx, domain.User{
 		Email:    req.Email,
 		Password: req.Password,
+		FName:    req.FirstName,
+		LName:    req.LastName,
+		Country:  req.Country,
+		State:    req.State,
+		Street:   req.Street,
+		City:     req.City,
+		Apart:    req.Apart,
+		Zip:      req.Zip,
 	})
 
-	if err == service.ErrUserDuplicateEmail {
+	if errors.Is(err, service.ErrUserDuplicateEmail) {
 		ctx.JSON(http.StatusOK, domain.Response{
 			Status:   6,
 			ErrorMsg: "email conflict",

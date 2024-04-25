@@ -65,16 +65,6 @@ func (a *AccountHandler) CreateOrUpdateSavingAccount(ctx *gin.Context) {
 
 	session := sessions.Default(ctx)
 	id := session.Get("userId")
-	//accounts, err := a.svc.GetAccount(ctx)
-	//if err != nil {
-	//	ctx.String(http.StatusOK, "system error")
-	//	return
-	//}
-	//
-	//if len(accounts) == 0 {
-	//	// create
-	//
-	//}
 
 	data := dao.Account{
 		Name:        "SavingAccount" + cast.ToString(rand.Intn(9999999)+1000000),
