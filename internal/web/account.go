@@ -44,7 +44,7 @@ func (a *AccountHandler) CreateOrUpdateSavingAccount(ctx *gin.Context) {
 	var req Req
 	if err := ctx.Bind(&req); err != nil {
 		ctx.JSON(http.StatusOK, domain.Response{
-			Status:   1,
+			Status:   -1,
 			ErrorMsg: "Args error",
 			Data:     responseData,
 		})
@@ -78,7 +78,7 @@ func (a *AccountHandler) CreateOrUpdateSavingAccount(ctx *gin.Context) {
 	account, err := a.svc.AccountDao.CreateOrUpdate(ctx, data)
 	if err != nil {
 		ctx.JSON(http.StatusOK, domain.Response{
-			Status:   2,
+			Status:   1,
 			ErrorMsg: "db error",
 			Data:     responseData,
 		})

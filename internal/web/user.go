@@ -149,6 +149,11 @@ func (u *UserHandler) Login(ctx *gin.Context) {
 	var responseData interface{}
 	var req loginReq
 	if err := ctx.Bind(&req); err != nil {
+		ctx.JSON(http.StatusOK, domain.Response{
+			Status:   -1,
+			ErrorMsg: "args error",
+			Data:     responseData,
+		})
 		return
 	}
 
