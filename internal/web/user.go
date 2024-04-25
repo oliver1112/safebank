@@ -56,6 +56,11 @@ func (u *UserHandler) SignUp(ctx *gin.Context) {
 	//receive request
 	var req SignUpReq
 	if err := ctx.Bind(&req); err != nil {
+		ctx.JSON(http.StatusOK, domain.Response{
+			Status:   -1,
+			ErrorMsg: "args error",
+			Data:     responseData,
+		})
 		return
 	}
 
