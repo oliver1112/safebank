@@ -31,16 +31,16 @@ func NewAccountDao(db *gorm.DB) *AccountDAO {
 	}
 }
 
-func (a *AccountDAO) GetAccount(ctx *gin.Context, id int64) ([]Account, error) {
+func (a *AccountDAO) GetAccount(ctx *gin.Context, userId int64) ([]Account, error) {
 	var accounts []Account
-	err := a.db.WithContext(ctx).Where("id = ?", id).Find(&accounts).Error
+	err := a.db.WithContext(ctx).Where("user_id = ?", userId).Find(&accounts).Error
 	//err := ud.db.WithContext(ctx).First(&u, "email = ?", email).Error
 	return accounts, err
 }
 
-func (a *AccountDAO) GetAccountWithType(ctx *gin.Context, id int64, accountType string) (Account, error) {
+func (a *AccountDAO) GetAccountWithType(ctx *gin.Context, userId int64, accountType string) (Account, error) {
 	var account Account
-	err := a.db.WithContext(ctx).Where("id = ? and account_type = ?", id, accountType).Find(&account).Error
+	err := a.db.WithContext(ctx).Where("user_id = ? and account_type = ?", userId, accountType).Find(&account).Error
 	//err := ud.db.WithContext(ctx).First(&u, "email = ?", email).Error
 	return account, err
 }

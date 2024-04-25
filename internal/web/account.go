@@ -29,6 +29,18 @@ func NewAccountHandler(db *gorm.DB) *AccountHandler {
 func (a *AccountHandler) RegisterRoutes(server *gin.Engine) {
 	ug := server.Group("/account")
 	ug.POST("/test", a.CreateOrUpdateSavingAccount)
+
+	ug.POST("/addsaving", a.CreateOrUpdateSavingAccount)
+	ug.POST("/addchecking", a.CreateOrUpdateCheckingAccount)
+	//ug.POST("/addloan", a.CreateOrUpdateLoan)
+	//ug.POST("/addhomeloan", a.CreateOrUpdateHomeLoan)
+	//ug.POST("/addstudentloan", a.CreateOrUpdateStuLoan)
+	//
+	//ug.GET("/saving", a.FindSavingAccount)
+	//ug.GET("/checking", a.FindCheckingAccount)
+	//ug.GET("/loan", a.FindLoan)
+	//ug.GET("/homeloan", a.FindHomeLoan)
+	//ug.GET("/studentloan", a.FindStuLoan)
 }
 
 func (a *AccountHandler) CreateOrUpdateSavingAccount(ctx *gin.Context) {
@@ -84,10 +96,30 @@ func (a *AccountHandler) CreateOrUpdateSavingAccount(ctx *gin.Context) {
 		})
 	}
 
+	randomValue := 100.00 + rand.Float64()*100.00
+	// Truncate to two decimal places
+	randomRate := float64(int(randomValue*100)) / 100
+
+	savingData := dao.Saving{
+		AccountID:    account.ID,
+		InterestRate: randomRate,
+		Amount:       0,
+		Account:      account,
+	}
+
+	saving, err := a.svc.SavingDao.CreateOrUpdate(ctx, savingData)
+	if err != nil {
+		ctx.JSON(http.StatusOK, domain.Response{
+			Status:   1,
+			ErrorMsg: "db error",
+			Data:     responseData,
+		})
+	}
+
 	ctx.JSON(http.StatusOK, domain.Response{
 		Status:   0,
 		ErrorMsg: "",
-		Data:     account,
+		Data:     saving,
 	})
 }
 
@@ -102,11 +134,65 @@ func (a *AccountHandler) CreateOrUpdateCheckingAccount(ctx *gin.Context) {
 	}
 
 	var req Req
+	var responseData interface{}
 	if err := ctx.Bind(&req); err != nil {
+		ctx.JSON(http.StatusOK, domain.Response{
+			Status:   -1,
+			ErrorMsg: "Args error",
+			Data:     responseData,
+		})
 		return
 	}
 
-	fmt.Printf("%v", req)
+	session := sessions.Default(ctx)
+	userId := session.Get("userId")
+
+	data := dao.Account{
+		Name:        "CheckingAccount" + cast.ToString(rand.Intn(9999999)+1000000),
+		Street:      req.Street,
+		City:        req.City,
+		State:       req.State,
+		Zip:         req.Zip,
+		Apart:       req.Apart,
+		AccountType: "C",
+		UserID:      cast.ToInt64(userId),
+	}
+
+	account, err := a.svc.AccountDao.CreateOrUpdate(ctx, data)
+	if err != nil {
+		ctx.JSON(http.StatusOK, domain.Response{
+			Status:   1,
+			ErrorMsg: "db error",
+			Data:     responseData,
+		})
+	}
+
+	// checking account
+	randomValue := rand.Float64() * 10.00
+	// Truncate to two decimal places
+	randomRate := float64(int(randomValue*100)) / 100
+
+	checkingData := dao.Checking{
+		AccountID:     account.ID,
+		ServiceCharge: randomRate,
+		Amount:        0,
+		Account:       account,
+	}
+
+	saving, err := a.svc.CheckingDao.CreateOrUpdate(ctx, checkingData)
+	if err != nil {
+		ctx.JSON(http.StatusOK, domain.Response{
+			Status:   1,
+			ErrorMsg: "db error",
+			Data:     responseData,
+		})
+	}
+
+	ctx.JSON(http.StatusOK, domain.Response{
+		Status:   0,
+		ErrorMsg: "",
+		Data:     saving,
+	})
 }
 
 func (a *AccountHandler) CreateOrUpdateHomeLoan(ctx *gin.Context) {

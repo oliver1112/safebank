@@ -2,6 +2,7 @@ package dao
 
 import (
 	"context"
+	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
 
@@ -22,7 +23,24 @@ func NewCheckingDao(db *gorm.DB) *CheckingDAO {
 	}
 }
 
-func (sd *CheckingDAO) Insert(ctx context.Context, c Checking) error {
-	err := sd.db.WithContext(ctx).Create(&c).Error
+func (cd *CheckingDAO) Insert(ctx context.Context, c Checking) error {
+	err := cd.db.WithContext(ctx).Create(&c).Error
 	return err
+}
+
+func (cd *CheckingDAO) GetChecking(ctx *gin.Context, userId int64) (Checking, error) {
+	var checking Checking
+	err := cd.db.WithContext(ctx).Where("user_id = ?", userId).First(&checking).Error
+	//err := ud.db.WithContext(ctx).First(&u, "email = ?", email).Error
+	return checking, err
+}
+
+func (cd *CheckingDAO) CreateOrUpdate(ctx context.Context, data Checking) (Checking, error) {
+	where := Checking{
+		AccountID: data.AccountID,
+	}
+	var checking Checking
+	err := cd.db.Where(where).Assign(data).FirstOrCreate(&checking).Error
+	//err := ud.db.WithContext(ctx).First(&u, "email = ?", email).Error
+	return checking, err
 }
