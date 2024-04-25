@@ -16,6 +16,12 @@ type Checking struct {
 	Amount        int64
 }
 
+func NewCheckingDao(db *gorm.DB) *CheckingDAO {
+	return &CheckingDAO{
+		db: db,
+	}
+}
+
 func (sd *CheckingDAO) Insert(ctx context.Context, c Checking) error {
 	err := sd.db.WithContext(ctx).Create(&c).Error
 	return err

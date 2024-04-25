@@ -190,6 +190,7 @@ func (u *UserHandler) AddSaving(ctx *gin.Context) {
 	}
 
 	userID, ok := id.(int64)
+	print(userID)
 	if !ok {
 		ctx.String(http.StatusOK, "session error")
 		return

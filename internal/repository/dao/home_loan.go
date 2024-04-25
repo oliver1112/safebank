@@ -19,3 +19,9 @@ type HomeLoan struct {
 	InsurZip     int
 	YearInsurPrm float64
 }
+
+func NewHomeLoanDao(db *gorm.DB) *HomeLoanDAO {
+	return &HomeLoanDAO{
+		db: db,
+	}
+}

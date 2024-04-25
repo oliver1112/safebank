@@ -16,6 +16,12 @@ type Saving struct {
 	Amount       float64
 }
 
+func NewSavingDao(db *gorm.DB) *SavingDAO {
+	return &SavingDAO{
+		db: db,
+	}
+}
+
 func (sd *SavingDAO) Insert(ctx context.Context, s Saving) error {
 	err := sd.db.WithContext(ctx).Create(&s).Error
 	return err

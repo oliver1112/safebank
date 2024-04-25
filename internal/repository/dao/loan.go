@@ -15,3 +15,9 @@ type Loan struct {
 	Payment   float64
 	Type      string
 }
+
+func NewLoanDao(db *gorm.DB) *LoanDAO {
+	return &LoanDAO{
+		db: db,
+	}
+}

@@ -7,6 +7,7 @@ type HomeLoan struct {
 	BuildYear    int
 	InsurAccNum  int
 	InsurName    string
+	InsurCountry string
 	InsurStreet  string
 	InsurCity    string
 	InsurState   string

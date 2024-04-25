@@ -9,6 +9,7 @@ type Account struct {
 	State       string
 	Zip         string
 	AccountType string
+	Apart       string
 	UserID      int64
 
 	Ctime int64
