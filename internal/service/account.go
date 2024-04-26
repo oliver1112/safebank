@@ -1,6 +1,7 @@
 package service
 
 import (
+	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/cast"
 	"gorm.io/gorm"
@@ -42,13 +43,15 @@ func NewAccountService(db *gorm.DB) *AccountService {
 }
 
 func (svc *AccountService) GetAccount(ctx *gin.Context) ([]dao.Account, error) {
-	userID, _ := ctx.Get("userID")
-	accounts, err := svc.AccountDao.GetAccount(ctx, cast.ToInt64(userID))
+	session := sessions.Default(ctx)
+	id := session.Get("userId")
+	accounts, err := svc.AccountDao.GetAccount(ctx, cast.ToInt64(id))
 	return accounts, err
 }
 
 func (svc *AccountService) CreateOrUpdateAccount(ctx *gin.Context, data interface{}) ([]dao.Account, error) {
-	id, _ := ctx.Get("userID")
+	session := sessions.Default(ctx)
+	id := session.Get("userId")
 	accounts, err := svc.AccountDao.GetAccount(ctx, cast.ToInt64(id))
 	return accounts, err
 }
