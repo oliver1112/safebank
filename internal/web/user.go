@@ -196,7 +196,7 @@ func (u *UserHandler) Login(ctx *gin.Context) {
 	sess := sessions.Default(ctx)
 	sess.Set("userId", user.ID)
 	sess.Options(sessions.Options{
-		SameSite: http.SameSiteStrictMode,
+		SameSite: http.SameSiteNoneMode,
 	})
 	err = sess.Save()
 	if err != nil {
