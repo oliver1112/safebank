@@ -195,6 +195,9 @@ func (u *UserHandler) Login(ctx *gin.Context) {
 	// Login success and set session
 	sess := sessions.Default(ctx)
 	sess.Set("userId", user.ID)
+	sess.Options(sessions.Options{
+		Domain: "http://43.130.62.214/",
+	})
 	err = sess.Save()
 	if err != nil {
 		ctx.JSON(http.StatusOK, domain.Response{
