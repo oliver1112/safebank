@@ -26,6 +26,9 @@ func main() {
 	accountHandler := initAccount(db)
 	accountHandler.RegisterRoutes(server)
 
+	adminHandler := initAdmin(db)
+	adminHandler.RegisterRoutes(server)
+
 	server.Run("0.0.0.0:8080")
 }
 
@@ -49,6 +52,7 @@ func initWebServer() *gin.Engine {
 	store := cookie.NewStore([]byte("secret"))
 	server.Use(sessions.Sessions("mysession", store))
 	server.Use(middleware.NewLoginMiddlewareBuilder().Build())
+	server.Use(middleware.NewAdminLoginMiddlewareBuilder().Build())
 
 	return server
 }
@@ -63,6 +67,10 @@ func initUser(db *gorm.DB) *web.UserHandler {
 
 func initAccount(db *gorm.DB) *web.AccountHandler {
 	return web.NewAccountHandler(db)
+}
+
+func initAdmin(db *gorm.DB) *web.AdminHandler {
+	return web.NewAdminHandler(db)
 }
 
 func initDB() *gorm.DB {

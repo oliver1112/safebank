@@ -11,19 +11,18 @@ import (
 	"strings"
 )
 
-type LoginMiddlewareBuilder struct {
+type AdminLoginMiddlewareBuilder struct {
 }
 
-func NewLoginMiddlewareBuilder() *LoginMiddlewareBuilder {
-	return &LoginMiddlewareBuilder{}
+func NewAdminLoginMiddlewareBuilder() *AdminLoginMiddlewareBuilder {
+	return &AdminLoginMiddlewareBuilder{}
 }
 
-func (l *LoginMiddlewareBuilder) Build() gin.HandlerFunc {
+func (a *AdminLoginMiddlewareBuilder) Build() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		// no need to login and check
-		if strings.HasPrefix(ctx.Request.URL.Path, "/admin") ||
-			ctx.Request.URL.Path == "/users/login" ||
-			ctx.Request.URL.Path == "/users/signup" {
+		if !strings.HasPrefix(ctx.Request.URL.Path, "/admin") ||
+			ctx.Request.URL.Path == "/admin/login" {
 			return
 		}
 
@@ -41,13 +40,13 @@ func (l *LoginMiddlewareBuilder) Build() gin.HandlerFunc {
 		ctx.Request.Body = ioutil.NopCloser(bytes.NewBuffer(data))
 
 		userToken := lib.UserToken{}
-		userToken.DecodeToken(m["userToken"])
+		userToken.DecodeToken(m["adminToken"])
 
 		id := userToken.UserID
 		if id <= 0 {
 			ctx.AbortWithStatus(http.StatusUnauthorized)
 			return
 		}
-		ctx.Set("userID", id)
+		ctx.Set("adminID", id)
 	}
 }
