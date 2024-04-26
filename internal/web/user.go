@@ -8,6 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"safebank/internal/domain"
+	"safebank/internal/lib"
 	"safebank/internal/service"
 )
 
@@ -163,7 +164,12 @@ func (u *UserHandler) Login(ctx *gin.Context) {
 		Email    string `json:"email"`
 		Password string `json:"password"`
 	}
-	var responseData interface{}
+	
+	type ResponseData struct {
+		UserToken string `json:"userToken"`
+	}
+	responseData := ResponseData{}
+
 	var req loginReq
 	if err := ctx.Bind(&req); err != nil {
 		ctx.JSON(http.StatusOK, domain.Response{
@@ -192,22 +198,12 @@ func (u *UserHandler) Login(ctx *gin.Context) {
 		return
 	}
 
-	// Login success and set session
-	sess := sessions.Default(ctx)
-	sess.Set("userId", user.ID)
-	sess.Options(sessions.Options{
-		SameSite: http.SameSiteLaxMode,
-		Domain:   "http://43.130.62.214/",
-	})
-	err = sess.Save()
-	if err != nil {
-		ctx.JSON(http.StatusOK, domain.Response{
-			Status:   3,
-			ErrorMsg: "Session save error",
-			Data:     responseData,
-		})
-		return
+	// Login success and generate userToken
+	userToken := lib.UserToken{
+		UserID: user.ID,
 	}
+
+	responseData.UserToken = userToken.EncodeToken()
 
 	ctx.JSON(http.StatusOK, domain.Response{
 		Status:   0,

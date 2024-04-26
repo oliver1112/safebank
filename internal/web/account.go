@@ -2,7 +2,6 @@ package web
 
 import (
 	"fmt"
-	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/cast"
 	"gorm.io/gorm"
@@ -55,6 +54,7 @@ func (a *AccountHandler) CreateOrUpdateSavingAccount(ctx *gin.Context) {
 	var responseData interface{}
 	var req Req
 	if err := ctx.Bind(&req); err != nil {
+		fmt.Println(err)
 		ctx.JSON(http.StatusOK, domain.Response{
 			Status:   -1,
 			ErrorMsg: "Args error",
@@ -63,8 +63,7 @@ func (a *AccountHandler) CreateOrUpdateSavingAccount(ctx *gin.Context) {
 		return
 	}
 
-	session := sessions.Default(ctx)
-	id := session.Get("userId")
+	userID, _ := ctx.Get("userID")
 
 	data := dao.Account{
 		Name:        "SavingAccount" + cast.ToString(rand.Intn(9999999)+1000000),
@@ -74,7 +73,7 @@ func (a *AccountHandler) CreateOrUpdateSavingAccount(ctx *gin.Context) {
 		Zip:         req.Zip,
 		Apart:       req.Apart,
 		AccountType: "S",
-		UserID:      cast.ToInt64(id),
+		UserID:      cast.ToInt64(userID),
 	}
 
 	account, err := a.svc.AccountDao.CreateOrUpdate(ctx, data)
@@ -134,8 +133,7 @@ func (a *AccountHandler) CreateOrUpdateCheckingAccount(ctx *gin.Context) {
 		return
 	}
 
-	session := sessions.Default(ctx)
-	userId := session.Get("userId")
+	userID, _ := ctx.Get("userID")
 
 	data := dao.Account{
 		Name:        "CheckingAccount" + cast.ToString(rand.Intn(9999999)+1000000),
@@ -145,7 +143,7 @@ func (a *AccountHandler) CreateOrUpdateCheckingAccount(ctx *gin.Context) {
 		Zip:         req.Zip,
 		Apart:       req.Apart,
 		AccountType: "C",
-		UserID:      cast.ToInt64(userId),
+		UserID:      cast.ToInt64(userID),
 	}
 
 	account, err := a.svc.AccountDao.CreateOrUpdate(ctx, data)
@@ -246,8 +244,7 @@ func (a *AccountHandler) CreateOrUpdateStuLoan(ctx *gin.Context) {
 		return
 	}
 
-	session := sessions.Default(ctx)
-	userId := session.Get("userId")
+	userID, _ := ctx.Get("userID")
 
 	data := dao.Account{
 		Name:        "StudentLoanAccount" + cast.ToString(rand.Intn(9999999)+1000000),
@@ -257,7 +254,7 @@ func (a *AccountHandler) CreateOrUpdateStuLoan(ctx *gin.Context) {
 		Zip:         req.Zip,
 		Apart:       req.Apart,
 		AccountType: "L",
-		UserID:      cast.ToInt64(userId),
+		UserID:      cast.ToInt64(userID),
 	}
 
 	account, err := a.svc.AccountDao.CreateOrUpdate(ctx, data)
