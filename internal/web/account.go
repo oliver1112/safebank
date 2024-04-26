@@ -1,7 +1,6 @@
 package web
 
 import (
-	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/cast"
 	"gorm.io/gorm"
@@ -62,8 +61,7 @@ func (a *AccountHandler) CreateOrUpdateSavingAccount(ctx *gin.Context) {
 		return
 	}
 
-	session := sessions.Default(ctx)
-	userId := session.Get("userId")
+	userId, _ := ctx.Get("userId")
 
 	data := dao.Account{
 		Name:        "SavingAccount" + cast.ToString(rand.Intn(9999999)+1000000),
@@ -133,8 +131,7 @@ func (a *AccountHandler) CreateOrUpdateCheckingAccount(ctx *gin.Context) {
 		return
 	}
 
-	session := sessions.Default(ctx)
-	userId := session.Get("userId")
+	userId, _ := ctx.Get("userId")
 
 	data := dao.Account{
 		Name:        "CheckingAccount" + cast.ToString(rand.Intn(9999999)+1000000),
@@ -208,8 +205,7 @@ func (a *AccountHandler) CreateOrUpdateLoan(ctx *gin.Context) {
 		return
 	}
 
-	session := sessions.Default(ctx)
-	userId := session.Get("userId")
+	userId, _ := ctx.Get("userId")
 
 	data := dao.Account{
 		Name:        "StudentLoanAccount" + cast.ToString(rand.Intn(9999999)+1000000),
@@ -293,8 +289,7 @@ func (a *AccountHandler) CreateOrUpdateHomeLoan(ctx *gin.Context) {
 		return
 	}
 
-	session := sessions.Default(ctx)
-	userId := session.Get("userId")
+	userId, _ := ctx.Get("userId")
 
 	data := dao.Account{
 		Name:        "StudentLoanAccount" + cast.ToString(rand.Intn(9999999)+1000000),
@@ -400,8 +395,7 @@ func (a *AccountHandler) CreateOrUpdateStuLoan(ctx *gin.Context) {
 		return
 	}
 
-	session := sessions.Default(ctx)
-	userId := session.Get("userId")
+	userId, _ := ctx.Get("userId")
 
 	data := dao.Account{
 		Name:        "StudentLoanAccount" + cast.ToString(rand.Intn(9999999)+1000000),
