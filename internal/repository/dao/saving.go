@@ -30,7 +30,7 @@ func (sd *SavingDAO) GetSaving(ctx *gin.Context, userId int64) (Saving, error) {
 	return saving, err
 }
 
-func (sd *SavingDAO) CreateOrUpdate(ctx context.Context, data Saving) (Saving, error) {
+func (sd *SavingDAO) CreateOrUpdate(ctx *gin.Context, data Saving) (Saving, error) {
 	where := Saving{
 		AccountID: data.AccountID,
 	}

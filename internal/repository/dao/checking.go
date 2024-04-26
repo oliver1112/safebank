@@ -35,7 +35,7 @@ func (cd *CheckingDAO) GetChecking(ctx *gin.Context, userId int64) (Checking, er
 	return checking, err
 }
 
-func (cd *CheckingDAO) CreateOrUpdate(ctx context.Context, data Checking) (Checking, error) {
+func (cd *CheckingDAO) CreateOrUpdate(ctx *gin.Context, data Checking) (Checking, error) {
 	where := Checking{
 		AccountID: data.AccountID,
 	}

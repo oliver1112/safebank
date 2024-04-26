@@ -32,9 +32,9 @@ func (a *AccountHandler) RegisterRoutes(server *gin.Engine) {
 
 	ug.POST("/addsaving", a.CreateOrUpdateSavingAccount)
 	ug.POST("/addchecking", a.CreateOrUpdateCheckingAccount)
-	//ug.POST("/addloan", a.CreateOrUpdateLoan)
+	ug.POST("/addloan", a.CreateOrUpdateLoan)
 	//ug.POST("/addhomeloan", a.CreateOrUpdateHomeLoan)
-	//ug.POST("/addstudentloan", a.CreateOrUpdateStuLoan)
+	ug.POST("/addstudentloan", a.CreateOrUpdateStuLoan)
 	//
 	//ug.GET("/saving", a.FindSavingAccount)
 	//ug.GET("/checking", a.FindCheckingAccount)
@@ -185,6 +185,10 @@ func (a *AccountHandler) CreateOrUpdateCheckingAccount(ctx *gin.Context) {
 	})
 }
 
+func (a *AccountHandler) CreateOrUpdateLoan(ctx *gin.Context) {
+
+}
+
 func (a *AccountHandler) CreateOrUpdateHomeLoan(ctx *gin.Context) {
 	type Req struct {
 		loanAmount   float64 `json:"lamount"`
@@ -218,7 +222,7 @@ func (a *AccountHandler) CreateOrUpdateStuLoan(ctx *gin.Context) {
 		loanAmount      float64 `json:"lamount"`
 		loanMonth       int     `json:"lmonth"`
 		EduInstitute    string  `json:"eduinsititute"`
-		StudentID       string  `json:"sid"`
+		StudentID       string  `json:"studentid"`
 		GradStatus      string  `json:"grad_status"`
 		ExpectGradMonth string  `json:"graduationMonth"`
 		ExpectGradYear  string  `json:"graduationYear"`
@@ -231,9 +235,84 @@ func (a *AccountHandler) CreateOrUpdateStuLoan(ctx *gin.Context) {
 	}
 
 	var req Req
+	var responseData interface{}
+
 	if err := ctx.Bind(&req); err != nil {
+		ctx.JSON(http.StatusOK, domain.Response{
+			Status:   -1,
+			ErrorMsg: "Args error",
+			Data:     responseData,
+		})
 		return
 	}
 
-	fmt.Printf("%v", req)
+	session := sessions.Default(ctx)
+	userId := session.Get("userId")
+
+	data := dao.Account{
+		Name:        "StudentLoanAccount" + cast.ToString(rand.Intn(9999999)+1000000),
+		Street:      req.Street,
+		City:        req.City,
+		State:       req.State,
+		Zip:         req.Zip,
+		Apart:       req.Apart,
+		AccountType: "L",
+		UserID:      cast.ToInt64(userId),
+	}
+
+	account, err := a.svc.AccountDao.CreateOrUpdate(ctx, data)
+	if err != nil {
+		ctx.JSON(http.StatusOK, domain.Response{
+			Status:   1,
+			ErrorMsg: "db error",
+			Data:     responseData,
+		})
+	}
+
+	randomValue := rand.Float64() * 50.00
+	// Truncate to two decimal places
+	randomRate := float64(int(randomValue*100)) / 100
+
+	loanData := dao.Loan{
+		AccountID: account.ID,
+		Rate:      randomRate,
+		Amount:    req.loanAmount,
+		Account:   account,
+		Month:     req.loanMonth,
+		Payment:   0,
+		Type:      "S",
+	}
+
+	loan, err := a.svc.LoanDao.CreateOrUpdate(ctx, loanData)
+	if err != nil {
+		ctx.JSON(http.StatusOK, domain.Response{
+			Status:   1,
+			ErrorMsg: "db error",
+			Data:     responseData,
+		})
+	}
+
+	stuLoanData := dao.StuLoan{
+		Loan:            loan,
+		EduInstitute:    req.EduInstitute,
+		StudentID:       cast.ToInt(req.StudentID),
+		GradStatus:      req.GradStatus,
+		ExpectGradMonth: cast.ToInt(req.ExpectGradMonth),
+		ExpectGradYear:  cast.ToInt(req.ExpectGradYear),
+	}
+
+	stuLoan, err := a.svc.StuLoanDao.CreateOrUpdate(ctx, stuLoanData)
+	if err != nil {
+		ctx.JSON(http.StatusOK, domain.Response{
+			Status:   1,
+			ErrorMsg: "db error",
+			Data:     responseData,
+		})
+	}
+
+	ctx.JSON(http.StatusOK, domain.Response{
+		Status:   0,
+		ErrorMsg: "",
+		Data:     stuLoan,
+	})
 }
