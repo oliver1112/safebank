@@ -1,7 +1,6 @@
 package web
 
 import (
-	"encoding/json"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/cast"
@@ -9,6 +8,7 @@ import (
 	"math/rand"
 	"net/http"
 	"safebank/internal/domain"
+	"safebank/internal/lib"
 	"safebank/internal/repository/dao"
 	"safebank/internal/service"
 )
@@ -55,58 +55,143 @@ func (a *AccountHandler) UserCenter(ctx *gin.Context) {
 	accountList, _ := a.svc.AccountDao.GetAccountList(ctx, userID)
 
 	type accountData struct {
-		Saving_account        dao.Saving
-		Checking_account      dao.Checking
-		Personal_loan_account dao.Loan
-		Home_loan_account     dao.HomeLoan
-		Student_loan_account  dao.StuLoan
+		SavingAccount       map[string]interface{} `json:"saving_account"`
+		CheckingAccount     map[string]interface{} `json:"checking_account"`
+		PersonalLoanAccount map[string]interface{} `json:"personal_loan_account"`
+		HomeLoanAccount     map[string]interface{} `json:"home_loan_account"`
+		StudentLoanAccount  map[string]interface{} `json:"student_loan_account"`
 	}
 
 	var data accountData
 
 	for _, account := range accountList {
+		if account.ID <= 0 {
+			continue
+		}
+		accountDetail := make(map[string]interface{})
+
 		if account.AccountType == "S" {
-			data.Saving_account, _ = a.svc.SavingDao.GetSaving(ctx, account.ID)
-			data.Saving_account.Account = account
+			savingData, err := a.svc.SavingDao.GetSaving(ctx, account.ID)
+			if err != nil {
+				ctx.JSON(http.StatusOK, domain.Response{
+					Status:   11,
+					ErrorMsg: "System error",
+					Data:     make(map[string]interface{}),
+				})
+				return
+			}
+			savingData.Account = account
+			err = lib.StructToMapSingleD2(savingData, "json", &accountDetail)
+			if err != nil {
+				ctx.JSON(http.StatusOK, domain.Response{
+					Status:   12,
+					ErrorMsg: "System error",
+					Data:     make(map[string]interface{}),
+				})
+				return
+			}
+			data.SavingAccount = accountDetail
 
 		} else if account.AccountType == "C" {
-			data.Checking_account, _ = a.svc.CheckingDao.GetChecking(ctx, account.ID)
-			data.Checking_account.Account = account
-
+			checkingData, err := a.svc.CheckingDao.GetChecking(ctx, account.ID)
+			if err != nil {
+				ctx.JSON(http.StatusOK, domain.Response{
+					Status:   21,
+					ErrorMsg: "System error",
+					Data:     make(map[string]interface{}),
+				})
+				return
+			}
+			checkingData.Account = account
+			err = lib.StructToMapSingleD2(checkingData, "json", &accountDetail)
+			if err != nil {
+				ctx.JSON(http.StatusOK, domain.Response{
+					Status:   12,
+					ErrorMsg: "System error",
+					Data:     make(map[string]interface{}),
+				})
+				return
+			}
+			data.CheckingAccount = accountDetail
 		} else if account.AccountType == "L" {
-			loanData, _ := a.svc.LoanDao.GetLoan(ctx, account.ID)
+			loanData, err := a.svc.LoanDao.GetLoan(ctx, account.ID)
+			if err != nil {
+				ctx.JSON(http.StatusOK, domain.Response{
+					Status:   31,
+					ErrorMsg: "System error",
+					Data:     make(map[string]interface{}),
+				})
+				return
+			}
+			loanData.Account = account
 
 			if loanData.Type == "L" {
-				data.Personal_loan_account = loanData
-				data.Personal_loan_account.Account = account
-
+				data.PersonalLoanAccount = accountDetail
 			} else if loanData.Type == "H" {
-				data.Home_loan_account, _ = a.svc.HomeLoanDao.GetHomeLoan(ctx, account.ID)
-				data.Home_loan_account.Loan = loanData
-				data.Home_loan_account.Loan.Account = account
+				homeLoanData, err := a.svc.HomeLoanDao.GetHomeLoan(ctx, account.ID)
+				if err != nil {
+					ctx.JSON(http.StatusOK, domain.Response{
+						Status:   33,
+						ErrorMsg: "System error",
+						Data:     make(map[string]interface{}),
+					})
+					return
+				}
+				homeLoanData.Loan = loanData
+				err = lib.StructToMapSingleD2(homeLoanData, "json", &accountDetail)
+				if err != nil {
+					ctx.JSON(http.StatusOK, domain.Response{
+						Status:   34,
+						ErrorMsg: "System error",
+						Data:     make(map[string]interface{}),
+					})
+					return
+				}
+				data.HomeLoanAccount = accountDetail
 
 			} else if loanData.Type == "S" {
-				data.Student_loan_account, _ = a.svc.StuLoanDao.GetStuLoan(ctx, account.ID)
-				data.Student_loan_account.Loan = loanData
-				data.Student_loan_account.Loan.Account = account
+				studentLoanData, err := a.svc.StuLoanDao.GetStuLoan(ctx, account.ID)
+				if err != nil {
+					ctx.JSON(http.StatusOK, domain.Response{
+						Status:   35,
+						ErrorMsg: "System error",
+						Data:     make(map[string]interface{}),
+					})
+					return
+				}
+				studentLoanData.Loan = loanData
+				err = lib.StructToMapSingleD2(studentLoanData, "json", &accountDetail)
+				if err != nil {
+					ctx.JSON(http.StatusOK, domain.Response{
+						Status:   36,
+						ErrorMsg: "System error",
+						Data:     make(map[string]interface{}),
+					})
+					return
+				}
+				data.StudentLoanAccount = accountDetail
+				fmt.Printf("\n1111111111111111\n")
+				fmt.Printf("%v\n", account)
+				fmt.Printf("%v\n", loanData)
+				fmt.Printf("%v\n", studentLoanData)
 			}
 		}
 	}
 
 	type Info struct {
-		UserInfo    domain.User
-		AccountInfo accountData
+		UserInfo    domain.User `json:"user_info"`
+		AccountInfo accountData `json:"account_info"`
 	}
 
 	var info Info
 	info.UserInfo = userInfo
 	info.AccountInfo = data
 
-	infoJSON, _ := json.MarshalIndent(info, "", "    ")
-
-	fmt.Printf("\n%v\n", string(infoJSON))
-	//ctx.JSON(http.StatusOK, string(infoJSON))
-	ctx.Data(http.StatusOK, "application/json", infoJSON)
+	ctx.JSON(http.StatusOK, domain.Response{
+		Status:   0,
+		ErrorMsg: "",
+		Data:     info,
+	})
 }
 
 func (a *AccountHandler) CreateOrUpdateSavingAccount(ctx *gin.Context) {

@@ -11,18 +11,18 @@ type AccountDAO struct {
 }
 
 type Account struct {
-	ID          int64 `gorm:"primaryKey,autoIncrement"`
-	Name        string
-	Street      string
-	City        string
-	State       string
-	Zip         string
-	Apart       string
-	AccountType string
-	UserID      int64
+	ID          int64  `gorm:"primaryKey,autoIncrement" json:"id"`
+	Name        string `json:"name"`
+	Street      string `json:"street"`
+	City        string `json:"city"`
+	State       string `json:"state"`
+	Zip         string `json:"zip"`
+	Apart       string `json:"party"`
+	AccountType string `json:"account_type"`
+	UserID      int64  `json:"user_id"`
 
-	Ctime int64
-	Utime int64
+	Ctime int64 `json:"ctime"`
+	Utime int64 `json:"utime"`
 }
 
 func NewAccountDao(db *gorm.DB) *AccountDAO {
@@ -36,6 +36,13 @@ func (a *AccountDAO) GetAccountList(ctx *gin.Context, userId int64) ([]Account, 
 	err := a.db.WithContext(ctx).Where("user_id = ?", userId).Find(&accounts).Error
 	//err := ud.db.WithContext(ctx).First(&u, "email = ?", email).Error
 	return accounts, err
+}
+
+func (a *AccountDAO) GetAccountByID(ctx *gin.Context, accountID int64) (Account, error) {
+	var account Account
+	err := a.db.WithContext(ctx).Where("id = ?", accountID).First(&account).Error
+	//err := ud.db.WithContext(ctx).First(&u, "email = ?", email).Error
+	return account, err
 }
 
 func (a *AccountDAO) GetAccountWithType(ctx *gin.Context, userId int64, accountType string) (Account, error) {

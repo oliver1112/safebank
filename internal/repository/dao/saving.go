@@ -11,10 +11,10 @@ type SavingDAO struct {
 }
 
 type Saving struct {
-	AccountID    int64 `gorm:"primaryKey"`
-	Account      Account
-	InterestRate float64
-	Amount       float64
+	AccountID    int64   `gorm:"primaryKey" json:"account_id"`
+	Account      Account `json:"account"`
+	InterestRate float64 `json:"interest_rate"`
+	Amount       float64 `json:"amount"`
 }
 
 func NewSavingDao(db *gorm.DB) *SavingDAO {

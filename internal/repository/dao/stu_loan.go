@@ -16,26 +16,26 @@ func NewStuLoanDao(db *gorm.DB) *StuLoanDAO {
 }
 
 type StuLoan struct {
-	LoanID int64 `gorm:"primaryKey"`
-	Loan   Loan  //`gorm:"foreignKey:AccountID"`
+	AccountID int64 `json:"account_id"`
+	Loan      Loan  `gorm:"foreignKey:AccountID"`
 
-	EduInstitute    string
-	StudentID       int
-	GradStatus      string
-	ExpectGradMonth int
-	ExpectGradYear  int
+	EduInstitute    string `json:"edu_institute"`
+	StudentID       int    `json:"student_id"`
+	GradStatus      string `json:"grad_status"`
+	ExpectGradMonth int    `json:"expect_grad_month"`
+	ExpectGradYear  int    `json:"expect_grad_year"`
 }
 
-func (sd *StuLoanDAO) GetStuLoan(ctx *gin.Context, userId int64) (StuLoan, error) {
+func (sd *StuLoanDAO) GetStuLoan(ctx *gin.Context, accountID int64) (StuLoan, error) {
 	var stuLoan StuLoan
-	err := sd.db.WithContext(ctx).Where("loan_id = ?", userId).First(&stuLoan).Error
+	err := sd.db.WithContext(ctx).Where("account_id = ?", accountID).First(&stuLoan).Error
 	//err := ud.db.WithContext(ctx).First(&u, "email = ?", email).Error
 	return stuLoan, err
 }
 
 func (sd *StuLoanDAO) CreateOrUpdate(ctx *gin.Context, data StuLoan) (StuLoan, error) {
 	where := StuLoan{
-		LoanID: data.LoanID,
+		AccountID: data.AccountID,
 	}
 	var stuLoan StuLoan
 	err := sd.db.Where(where).Assign(data).FirstOrCreate(&stuLoan).Error

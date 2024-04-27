@@ -10,13 +10,13 @@ type LoanDAO struct {
 }
 
 type Loan struct {
-	AccountID int64 `gorm:"primaryKey"`
+	AccountID int64 `gorm:"primaryKey" json:"account_id"`
 	Account   Account
-	Rate      float64
-	Amount    float64
-	Month     int
-	Payment   float64
-	Type      string
+	Rate      float64 `json:"rate"`
+	Amount    float64 `json:"amount"`
+	Month     int     `json:"month"`
+	Payment   float64 `json:"payment"`
+	Type      string  `json:"type"`
 }
 
 func NewLoanDao(db *gorm.DB) *LoanDAO {
@@ -28,6 +28,13 @@ func NewLoanDao(db *gorm.DB) *LoanDAO {
 func (sd *LoanDAO) GetLoan(ctx *gin.Context, accountId int64) (Loan, error) {
 	var loan Loan
 	err := sd.db.WithContext(ctx).Where("account_id = ?", accountId).First(&loan).Error
+	//err := ud.db.WithContext(ctx).First(&u, "email = ?", email).Error
+	return loan, err
+}
+
+func (sd *LoanDAO) GetByAccountID(ctx *gin.Context, accountID int64) (Loan, error) {
+	var loan Loan
+	err := sd.db.WithContext(ctx).Where("account_id = ?", accountID).First(&loan).Error
 	//err := ud.db.WithContext(ctx).First(&u, "email = ?", email).Error
 	return loan, err
 }

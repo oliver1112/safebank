@@ -11,10 +11,10 @@ type CheckingDAO struct {
 }
 
 type Checking struct {
-	AccountID     int64 `gorm:"primaryKey"`
+	AccountID     int64 `gorm:"primaryKey" json:"account_id"`
 	Account       Account
-	ServiceCharge float64
-	Amount        int64
+	ServiceCharge float64 `json:"serviceCharge"`
+	Amount        int64   `json:"amount"`
 }
 
 func NewCheckingDao(db *gorm.DB) *CheckingDAO {
@@ -32,6 +32,12 @@ func (cd *CheckingDAO) GetChecking(ctx *gin.Context, accountId int64) (Checking,
 	var checking Checking
 	err := cd.db.WithContext(ctx).Where("account_id = ?", accountId).First(&checking).Error
 	//err := ud.db.WithContext(ctx).First(&u, "email = ?", email).Error
+	return checking, err
+}
+
+func (cd *CheckingDAO) GetCheckingByAccountID(ctx *gin.Context, accountID int64) (Checking, error) {
+	var checking Checking
+	err := cd.db.WithContext(ctx).Where("account_id = ?", accountID).First(&checking).Error
 	return checking, err
 }
 

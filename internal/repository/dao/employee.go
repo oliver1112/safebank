@@ -8,21 +8,21 @@ import (
 
 // User is the mapping to database form, also called entity, model, PO(persistent object)
 type Employee struct {
-	ID      int64  `gorm:"primaryKey,autoIncrement"`
-	Email   string `gorm:"unique"`
-	FName   string
-	LName   string
-	Country string
+	ID      int64  `gorm:"primaryKey,autoIncrement" json:"id"`
+	Email   string `gorm:"unique" json:"email"`
+	FName   string `json:"fname"`
+	LName   string `json:"lname"`
+	Country string `json:"country"`
 
-	State  string
-	City   string
-	Street string
-	Apart  string
-	Zip    string
+	State  string `json:"state"`
+	City   string `json:"city"`
+	Street string `json:"street"`
+	Apart  string `json:"party"`
+	Zip    string `json:"zip"`
 
-	Password string
-	Ctime    int64
-	Utime    int64
+	Password string `json:"password"`
+	Ctime    int64  `json:"ctime"`
+	Utime    int64  `json:"utime"`
 }
 
 type EmployeeDAO struct {

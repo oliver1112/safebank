@@ -10,17 +10,17 @@ type HomeLoanDAO struct {
 }
 
 type HomeLoan struct {
-	LoanID int64 `gorm:"primaryKey"`
-	Loan   Loan  //`gorm:"foreignKey:AccountID"`
+	AccountID int64 `json:"account_id"`
+	Loan      Loan  `gorm:"foreignKey:AccountID"`
 
-	BuildYear    int
-	InsurAccNum  int
-	InsurName    string
-	InsurStreet  string
-	InsurCity    string
-	InsurState   string
-	InsurZip     int
-	YearInsurPrm float64
+	BuildYear    int     `json:"build_year"`
+	InsurAccNum  int     `json:"insur_acc_num"`
+	InsurName    string  `json:"insur_name"`
+	InsurStreet  string  `json:"insur_street"`
+	InsurCity    string  `json:"insur_city"`
+	InsurState   string  `json:"insur_state"`
+	InsurZip     int     `json:"insur_zip"`
+	YearInsurPrm float64 `json:"year_insur_prm"`
 }
 
 func NewHomeLoanDao(db *gorm.DB) *HomeLoanDAO {
@@ -31,14 +31,14 @@ func NewHomeLoanDao(db *gorm.DB) *HomeLoanDAO {
 
 func (hd *HomeLoanDAO) GetHomeLoan(ctx *gin.Context, accountId int64) (HomeLoan, error) {
 	var homeLoan HomeLoan
-	err := hd.db.WithContext(ctx).Where("loan_id = ?", accountId).First(&homeLoan).Error
+	err := hd.db.WithContext(ctx).Where("account_id = ?", accountId).First(&homeLoan).Error
 	//err := ud.db.WithContext(ctx).First(&u, "email = ?", email).Error
 	return homeLoan, err
 }
 
 func (hd *HomeLoanDAO) CreateOrUpdate(ctx *gin.Context, data HomeLoan) (HomeLoan, error) {
 	where := HomeLoan{
-		LoanID: data.LoanID,
+		AccountID: data.AccountID,
 	}
 	var homeLoan HomeLoan
 	err := hd.db.Where(where).Assign(data).FirstOrCreate(&homeLoan).Error
