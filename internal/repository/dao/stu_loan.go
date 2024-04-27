@@ -6,12 +6,12 @@ import (
 )
 
 type StuLoanDAO struct {
-	db *gorm.DB
+	Db *gorm.DB
 }
 
 func NewStuLoanDao(db *gorm.DB) *StuLoanDAO {
 	return &StuLoanDAO{
-		db: db,
+		Db: db,
 	}
 }
 
@@ -28,7 +28,7 @@ type StuLoan struct {
 
 func (sd *StuLoanDAO) GetStuLoan(ctx *gin.Context, accountID int64) (StuLoan, error) {
 	var stuLoan StuLoan
-	err := sd.db.WithContext(ctx).Where("account_id = ?", accountID).First(&stuLoan).Error
+	err := sd.Db.WithContext(ctx).Where("account_id = ?", accountID).First(&stuLoan).Error
 	//err := ud.db.WithContext(ctx).First(&u, "email = ?", email).Error
 	return stuLoan, err
 }
@@ -38,7 +38,7 @@ func (sd *StuLoanDAO) CreateOrUpdate(ctx *gin.Context, data StuLoan) (StuLoan, e
 		AccountID: data.AccountID,
 	}
 	var stuLoan StuLoan
-	err := sd.db.Where(where).Assign(data).FirstOrCreate(&stuLoan).Error
+	err := sd.Db.Where(where).Assign(data).FirstOrCreate(&stuLoan).Error
 	//err := ud.db.WithContext(ctx).First(&u, "email = ?", email).Error
 	return stuLoan, err
 }

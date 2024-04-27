@@ -7,7 +7,7 @@ import (
 )
 
 type SavingDAO struct {
-	db *gorm.DB
+	Db *gorm.DB
 }
 
 type Saving struct {
@@ -19,13 +19,13 @@ type Saving struct {
 
 func NewSavingDao(db *gorm.DB) *SavingDAO {
 	return &SavingDAO{
-		db: db,
+		Db: db,
 	}
 }
 
 func (sd *SavingDAO) GetSaving(ctx *gin.Context, accountId int64) (Saving, error) {
 	var saving Saving
-	err := sd.db.WithContext(ctx).Where("account_id = ?", accountId).First(&saving).Error
+	err := sd.Db.WithContext(ctx).Where("account_id = ?", accountId).First(&saving).Error
 	//err := ud.db.WithContext(ctx).First(&u, "email = ?", email).Error
 	return saving, err
 }
@@ -35,12 +35,12 @@ func (sd *SavingDAO) CreateOrUpdate(ctx *gin.Context, data Saving) (Saving, erro
 		AccountID: data.AccountID,
 	}
 	var saving Saving
-	err := sd.db.Where(where).Assign(data).FirstOrCreate(&saving).Error
+	err := sd.Db.Where(where).Assign(data).FirstOrCreate(&saving).Error
 	//err := ud.db.WithContext(ctx).First(&u, "email = ?", email).Error
 	return saving, err
 }
 
 func (sd *SavingDAO) Insert(ctx context.Context, s Saving) error {
-	err := sd.db.WithContext(ctx).Create(&s).Error
+	err := sd.Db.WithContext(ctx).Create(&s).Error
 	return err
 }

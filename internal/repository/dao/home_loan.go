@@ -6,7 +6,7 @@ import (
 )
 
 type HomeLoanDAO struct {
-	db *gorm.DB
+	Db *gorm.DB
 }
 
 type HomeLoan struct {
@@ -25,13 +25,13 @@ type HomeLoan struct {
 
 func NewHomeLoanDao(db *gorm.DB) *HomeLoanDAO {
 	return &HomeLoanDAO{
-		db: db,
+		Db: db,
 	}
 }
 
 func (hd *HomeLoanDAO) GetHomeLoan(ctx *gin.Context, accountId int64) (HomeLoan, error) {
 	var homeLoan HomeLoan
-	err := hd.db.WithContext(ctx).Where("account_id = ?", accountId).First(&homeLoan).Error
+	err := hd.Db.WithContext(ctx).Where("account_id = ?", accountId).First(&homeLoan).Error
 	//err := ud.db.WithContext(ctx).First(&u, "email = ?", email).Error
 	return homeLoan, err
 }
@@ -41,7 +41,7 @@ func (hd *HomeLoanDAO) CreateOrUpdate(ctx *gin.Context, data HomeLoan) (HomeLoan
 		AccountID: data.AccountID,
 	}
 	var homeLoan HomeLoan
-	err := hd.db.Where(where).Assign(data).FirstOrCreate(&homeLoan).Error
+	err := hd.Db.Where(where).Assign(data).FirstOrCreate(&homeLoan).Error
 	//err := ud.db.WithContext(ctx).First(&u, "email = ?", email).Error
 	return homeLoan, err
 }

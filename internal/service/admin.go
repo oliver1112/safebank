@@ -5,19 +5,21 @@ import (
 	"github.com/spf13/cast"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
+	"safebank/internal/domain"
 	"safebank/internal/repository"
 	"safebank/internal/repository/dao"
 )
 
 type AdminService struct {
-	userRepo    *repository.UserRepository
-	AccountDao  *dao.AccountDAO
-	CheckingDao *dao.CheckingDAO
-	HomeLoanDao *dao.HomeLoanDAO
-	LoanDao     *dao.LoanDAO
-	SavingDao   *dao.SavingDAO
-	StuLoanDao  *dao.StuLoanDAO
-	EmployeeDao *dao.EmployeeDAO
+	userRepo       *repository.UserRepository
+	AccountDao     *dao.AccountDAO
+	CheckingDao    *dao.CheckingDAO
+	HomeLoanDao    *dao.HomeLoanDAO
+	LoanDao        *dao.LoanDAO
+	SavingDao      *dao.SavingDAO
+	StuLoanDao     *dao.StuLoanDAO
+	EmployeeDao    *dao.EmployeeDAO
+	AccountService *AccountService
 }
 
 func NewAdminService(db *gorm.DB) *AdminService {
@@ -32,16 +34,18 @@ func NewAdminService(db *gorm.DB) *AdminService {
 	savingDao := dao.NewSavingDao(db)
 	stuLoanDao := dao.NewStuLoanDao(db)
 	employeeDao := dao.NewEmployeeDao(db)
+	accountService := NewAccountService(db)
 
 	return &AdminService{
-		userRepo:    userRepo,
-		AccountDao:  accountDao,
-		CheckingDao: checkingDao,
-		HomeLoanDao: homeLoanDao,
-		LoanDao:     loanDao,
-		SavingDao:   savingDao,
-		StuLoanDao:  stuLoanDao,
-		EmployeeDao: employeeDao,
+		userRepo:       userRepo,
+		AccountDao:     accountDao,
+		CheckingDao:    checkingDao,
+		HomeLoanDao:    homeLoanDao,
+		LoanDao:        loanDao,
+		SavingDao:      savingDao,
+		StuLoanDao:     stuLoanDao,
+		EmployeeDao:    employeeDao,
+		AccountService: accountService,
 	}
 }
 
@@ -66,66 +70,100 @@ func (a *AdminService) Login(ctx *gin.Context, email, password string) (dao.Empl
 	return employee, nil
 }
 
-func (a *AdminService) GetAccountInfo(ctx *gin.Context, userID int64) (interface{}, error) {
+func (a *AdminService) GetAccountInfo(ctx *gin.Context, userID int64) (domain.UserCenter, error) {
 	// get user info
-	// TODO
-	accountInfo := make(map[string]interface{}, 0)
-
-	return accountInfo, nil
+	return a.AccountService.GetAccountsByUserID(ctx, userID)
 }
 
-func (a *AdminService) UpdateAccountInfo(ctx *gin.Context, AccountID int64, updateData map[string]interface{}) (interface{}, error) {
+func (a *AdminService) UpdateAccountInfo(ctx *gin.Context, AccountID int64, updateData map[string]interface{}) (bool, error) {
 
-	accountInfo, err := a.AccountDao.GetAccountByID(ctx, AccountID)
+	accountData, err := a.AccountDao.GetAccountByID(ctx, AccountID)
 	if err != nil {
-		return nil, err
+		return false, err
+	}
+
+	if accountData.ID <= 0 {
+		return false, nil
 	}
 
 	// update account info
 	if value, ok := updateData["name"]; ok {
-		accountInfo.Name = cast.ToString(value)
+		accountData.Name = cast.ToString(value)
 	}
 
 	if value, ok := updateData["street"]; ok {
-		accountInfo.Street = cast.ToString(value)
+		accountData.Street = cast.ToString(value)
 	}
 
 	if value, ok := updateData["city"]; ok {
-		accountInfo.City = cast.ToString(value)
+		accountData.City = cast.ToString(value)
 	}
 
 	if value, ok := updateData["state"]; ok {
-		accountInfo.State = cast.ToString(value)
+		accountData.State = cast.ToString(value)
 	}
 
 	if value, ok := updateData["zip"]; ok {
-		accountInfo.Zip = cast.ToString(value)
+		accountData.Zip = cast.ToString(value)
 	}
 
-	//a.AccountDao.db.Save(&accountInfo)
-
-	if accountInfo.AccountType == "C" {
-		//checkingInfo, _ := a.CheckingDao.GetChecking(ctx, accountInfo.ID)
-
-		if value, ok := updateData["zip"]; ok {
-			accountInfo.Zip = cast.ToString(value)
+	if accountData.AccountType == "C" {
+		checkingData, err := a.CheckingDao.GetChecking(ctx, accountData.ID)
+		if err != nil {
+			return false, err
 		}
 
-	} else if accountInfo.AccountType == "S" {
-		// TODO update saving
-	} else if accountInfo.AccountType == "L" {
+		if value, ok := updateData["service_charge"]; ok {
+			checkingData.ServiceCharge = cast.ToFloat64(value)
+		}
+
+		if value, ok := updateData["amount"]; ok {
+			checkingData.Amount = cast.ToInt64(value)
+		}
+
+		checkingData.Account = accountData
+		a.CheckingDao.Db.Save(&checkingData)
+	} else if accountData.AccountType == "S" {
+		savingData, err := a.SavingDao.GetSaving(ctx, accountData.ID)
+		if err != nil {
+			return false, err
+		}
+
+		if value, ok := updateData["interest_rate"]; ok {
+			savingData.InterestRate = cast.ToFloat64(value)
+		}
+
+		if value, ok := updateData["amount"]; ok {
+			savingData.Amount = cast.ToFloat64(value)
+		}
+
+		savingData.Account = accountData
+		a.SavingDao.Db.Save(&savingData)
+	} else if accountData.AccountType == "L" {
 		loanInfo, err := a.LoanDao.GetByAccountID(ctx, AccountID)
 		if err != nil {
-			return nil, err
+			return false, err
 		}
+		loanInfo.Account = accountData
+
 		if loanInfo.Type == "H" {
-			// TODO update homeloan
+			homeLoanInfo, err := a.HomeLoanDao.GetHomeLoan(ctx, AccountID)
+			if err != nil {
+				return false, err
+			}
+			homeLoanInfo.Loan = loanInfo
+			a.HomeLoanDao.Db.Save(&homeLoanInfo)
 		} else if loanInfo.Type == "S" {
-			// TODO update student loan
+			studentLoanInfo, err := a.StuLoanDao.GetStuLoan(ctx, AccountID)
+			if err != nil {
+				return false, err
+			}
+			studentLoanInfo.Loan = loanInfo
+			a.StuLoanDao.Db.Save(&studentLoanInfo)
 		} else if loanInfo.Type == "L" {
-			// TODO update general loan
+			a.LoanDao.Db.Save(&loanInfo)
 		}
 	}
 
-	return accountInfo, nil
+	return true, nil
 }
