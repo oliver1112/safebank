@@ -25,9 +25,9 @@ func NewLoanDao(db *gorm.DB) *LoanDAO {
 	}
 }
 
-func (sd *LoanDAO) GetSaving(ctx *gin.Context, userId int64) (Loan, error) {
+func (sd *LoanDAO) GetLoan(ctx *gin.Context, accountId int64) (Loan, error) {
 	var loan Loan
-	err := sd.db.WithContext(ctx).Where("user_id = ?", userId).First(&loan).Error
+	err := sd.db.WithContext(ctx).Where("account_id = ?", accountId).First(&loan).Error
 	//err := ud.db.WithContext(ctx).First(&u, "email = ?", email).Error
 	return loan, err
 }

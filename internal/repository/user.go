@@ -33,8 +33,24 @@ func (r *UserRepository) FindByEmail(ctx context.Context, email string) (domain.
 	}, nil
 }
 
-func (r *UserRepository) FindUserByUserID(userID int64) domain.User {
-	return domain.User{}
+func (r *UserRepository) FindUserByUserID(ctx context.Context, userID int64) (domain.User, error) {
+	u, err := r.dao.FindById(ctx, userID)
+	if err != nil {
+		return domain.User{}, err
+	}
+	return domain.User{
+		ID:      u.ID,
+		Email:   u.Email,
+		FName:   u.FName,
+		LName:   u.LName,
+		Country: u.Country,
+
+		State:  u.State,
+		City:   u.City,
+		Street: u.Street,
+		Apart:  u.Apart,
+		Zip:    u.Zip,
+	}, nil
 }
 
 func (r *UserRepository) Create(ctx context.Context, u domain.User) error {

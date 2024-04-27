@@ -3,30 +3,65 @@ package service
 import (
 	"encoding/json"
 	"fmt"
-	"log"
+	"testing"
 )
 
-// Define a struct
-type Person struct {
-	Name    string
-	Age     int
-	Address string
+// Define a Room struct as the innermost level of nesting
+type Room struct {
+	Type   string
+	Number int
 }
 
-func main() {
-	// Create an instance of the struct
-	person := Person{
-		Name:    "John Doe",
-		Age:     30,
-		Address: "123 Elm St",
+// Define a Detail struct that includes Room as a nested struct
+type Detail struct {
+	Building   string
+	Apartment  int
+	RoomDetail Room
+}
+
+// Define an Address struct that includes Detail as a nested struct
+type Address struct {
+	Street, City, State, Country string
+	ZipCode                      int
+	ResidenceDetail              Detail
+}
+
+// Define a User struct that includes Address as a nested struct
+type User struct {
+	FirstName, LastName string
+	Age                 int
+	Address             Address
+}
+
+func TestEncrypt(t *testing.T) {
+	// Create an instance of User with nested Address, Detail, and Room
+	user := User{
+		FirstName: "John",
+		LastName:  "Doe",
+		Age:       30,
+		Address: Address{
+			Street:  "1234 Maple Street",
+			City:    "Somewhere",
+			State:   "CA",
+			Country: "USA",
+			ZipCode: 90210,
+			ResidenceDetail: Detail{
+				Building:  "Building A",
+				Apartment: 101,
+				RoomDetail: Room{
+					Type:   "Living Room",
+					Number: 1,
+				},
+			},
+		},
 	}
 
-	// Convert struct to JSON string
-	jsonData, err := json.Marshal(person)
+	// Convert the User instance into JSON format
+	userJSON, err := json.MarshalIndent(user, "", "    ")
 	if err != nil {
-		log.Fatal(err)
+		fmt.Println("Error marshalling JSON:", err)
+		return
 	}
 
-	// Print the JSON string
-	fmt.Println(string(jsonData))
+	fmt.Println(string(userJSON))
 }

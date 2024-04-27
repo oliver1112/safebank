@@ -18,6 +18,4 @@ type User struct {
 	Password string
 	Ctime    int64
 	Utime    int64
-
-	Account []Account
 }

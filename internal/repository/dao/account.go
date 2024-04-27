@@ -31,7 +31,7 @@ func NewAccountDao(db *gorm.DB) *AccountDAO {
 	}
 }
 
-func (a *AccountDAO) GetAccount(ctx *gin.Context, userId int64) ([]Account, error) {
+func (a *AccountDAO) GetAccountList(ctx *gin.Context, userId int64) ([]Account, error) {
 	var accounts []Account
 	err := a.db.WithContext(ctx).Where("user_id = ?", userId).Find(&accounts).Error
 	//err := ud.db.WithContext(ctx).First(&u, "email = ?", email).Error

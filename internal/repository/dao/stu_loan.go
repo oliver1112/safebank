@@ -26,9 +26,9 @@ type StuLoan struct {
 	ExpectGradYear  int
 }
 
-func (sd *StuLoanDAO) GetSaving(ctx *gin.Context, userId int64) (StuLoan, error) {
+func (sd *StuLoanDAO) GetStuLoan(ctx *gin.Context, userId int64) (StuLoan, error) {
 	var stuLoan StuLoan
-	err := sd.db.WithContext(ctx).Where("user_id = ?", userId).First(&stuLoan).Error
+	err := sd.db.WithContext(ctx).Where("loan_id = ?", userId).First(&stuLoan).Error
 	//err := ud.db.WithContext(ctx).First(&u, "email = ?", email).Error
 	return stuLoan, err
 }

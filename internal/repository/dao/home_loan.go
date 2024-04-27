@@ -29,9 +29,9 @@ func NewHomeLoanDao(db *gorm.DB) *HomeLoanDAO {
 	}
 }
 
-func (hd *HomeLoanDAO) GetSaving(ctx *gin.Context, userId int64) (HomeLoan, error) {
+func (hd *HomeLoanDAO) GetHomeLoan(ctx *gin.Context, accountId int64) (HomeLoan, error) {
 	var homeLoan HomeLoan
-	err := hd.db.WithContext(ctx).Where("user_id = ?", userId).First(&homeLoan).Error
+	err := hd.db.WithContext(ctx).Where("loan_id = ?", accountId).First(&homeLoan).Error
 	//err := ud.db.WithContext(ctx).First(&u, "email = ?", email).Error
 	return homeLoan, err
 }

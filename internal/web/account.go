@@ -1,6 +1,8 @@
 package web
 
 import (
+	"encoding/json"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/cast"
 	"gorm.io/gorm"
@@ -33,12 +35,78 @@ func (a *AccountHandler) RegisterRoutes(server *gin.Engine) {
 	ug.POST("/addloan", a.CreateOrUpdateLoan)
 	ug.POST("/addhomeloan", a.CreateOrUpdateHomeLoan)
 	ug.POST("/addstudentloan", a.CreateOrUpdateStuLoan)
-	//
-	//ug.GET("/saving", a.FindSavingAccount)
+
+	ug.POST("/usercenter", a.UserCenter)
 	//ug.GET("/checking", a.FindCheckingAccount)
 	//ug.GET("/loan", a.FindLoan)
 	//ug.GET("/homeloan", a.FindHomeLoan)
 	//ug.GET("/studentloan", a.FindStuLoan)
+}
+
+func (a *AccountHandler) UserCenter(ctx *gin.Context) {
+
+	userId, _ := ctx.Get("userID")
+	userID := cast.ToInt64(userId)
+
+	userInfo, _ := a.svc.UserRepo.FindUserByUserID(ctx, userID)
+
+	fmt.Printf("%v", userInfo)
+
+	accountList, _ := a.svc.AccountDao.GetAccountList(ctx, userID)
+
+	type accountData struct {
+		Saving_account        dao.Saving
+		Checking_account      dao.Checking
+		Personal_loan_account dao.Loan
+		Home_loan_account     dao.HomeLoan
+		Student_loan_account  dao.StuLoan
+	}
+
+	var data accountData
+
+	for _, account := range accountList {
+		if account.AccountType == "S" {
+			data.Saving_account, _ = a.svc.SavingDao.GetSaving(ctx, account.ID)
+			data.Saving_account.Account = account
+
+		} else if account.AccountType == "C" {
+			data.Checking_account, _ = a.svc.CheckingDao.GetChecking(ctx, account.ID)
+			data.Checking_account.Account = account
+
+		} else if account.AccountType == "L" {
+			loanData, _ := a.svc.LoanDao.GetLoan(ctx, account.ID)
+
+			if loanData.Type == "L" {
+				data.Personal_loan_account = loanData
+				data.Personal_loan_account.Account = account
+
+			} else if loanData.Type == "H" {
+				data.Home_loan_account, _ = a.svc.HomeLoanDao.GetHomeLoan(ctx, account.ID)
+				data.Home_loan_account.Loan = loanData
+				data.Home_loan_account.Loan.Account = account
+
+			} else if loanData.Type == "S" {
+				data.Student_loan_account, _ = a.svc.StuLoanDao.GetStuLoan(ctx, account.ID)
+				data.Student_loan_account.Loan = loanData
+				data.Student_loan_account.Loan.Account = account
+			}
+		}
+	}
+
+	type Info struct {
+		UserInfo    domain.User
+		AccountInfo accountData
+	}
+
+	var info Info
+	info.UserInfo = userInfo
+	info.AccountInfo = data
+
+	infoJSON, _ := json.MarshalIndent(info, "", "    ")
+
+	fmt.Printf("\n%v\n", string(infoJSON))
+	//ctx.JSON(http.StatusOK, string(infoJSON))
+	ctx.Data(http.StatusOK, "application/json", infoJSON)
 }
 
 func (a *AccountHandler) CreateOrUpdateSavingAccount(ctx *gin.Context) {
@@ -208,7 +276,7 @@ func (a *AccountHandler) CreateOrUpdateLoan(ctx *gin.Context) {
 	userId, _ := ctx.Get("userID")
 
 	data := dao.Account{
-		Name:        "StudentLoanAccount" + cast.ToString(rand.Intn(9999999)+1000000),
+		Name:        "PersonalLoanAccount" + cast.ToString(rand.Intn(9999999)+1000000),
 		Street:      req.Street,
 		City:        req.City,
 		State:       req.State,
@@ -292,7 +360,7 @@ func (a *AccountHandler) CreateOrUpdateHomeLoan(ctx *gin.Context) {
 	userId, _ := ctx.Get("userID")
 
 	data := dao.Account{
-		Name:        "StudentLoanAccount" + cast.ToString(rand.Intn(9999999)+1000000),
+		Name:        "HomeLoanAccount" + cast.ToString(rand.Intn(9999999)+1000000),
 		Street:      req.Street,
 		City:        req.City,
 		State:       req.State,
@@ -322,7 +390,7 @@ func (a *AccountHandler) CreateOrUpdateHomeLoan(ctx *gin.Context) {
 		Account:   account,
 		Month:     req.loanMonth,
 		Payment:   0,
-		Type:      "S",
+		Type:      "H",
 	}
 
 	loan, err := a.svc.LoanDao.CreateOrUpdate(ctx, loanData)

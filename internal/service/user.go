@@ -2,9 +2,7 @@ package service
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
-	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
 	"safebank/internal/domain"
 	"safebank/internal/repository"
@@ -65,37 +63,38 @@ func (svc *UserService) Login(ctx context.Context, email, password string) (doma
 	return u, nil
 }
 
-func (svc *UserService) GetProfile(userID int64) (gin.H, error) {
-
-	//savingAcc := FindSavingByUserID(userID)
-	//checkingAcc := FindCheckingByUserID(userID)
-	//loanAcc := FindLoanAccByUserID(userID)
-	//studentLoanAcc := FindStudentLoanByUserID(userID)
-	//homeLoanAcc := FindHomeLoanByUserID(userID)
-
-	//return gin.H{
-	//
-	//
-	//	"Account" : gin.H{
-	//		"savingAcc":      savingAcc,
-	//		"checkingAcc":    checkingAcc,
-	//		"loanAcc":        loanAcc,
-	//		"studentLoanAcc": studentLoanAcc,
-	//		"homeLoanAcc":    homeLoanAcc,
-	//	},
-	//}, nil
-
-	user := svc.userRepo.FindUserByUserID(userID)
-	jsonData, _ := json.Marshal(user)
-
-	//for _, account := range user.Account {
-	//	if account.AccountType == "S": {
-	//		saving := svc.accountRepo.FindSavingByAccID(account.ID)
-	//	} else if account.AccountType == "C": {
-	//		checking := svc.accountRepo.FindCheckByAccID(account.ID)
-	//	} else if
-	//}
-
-	return gin.H{"data": string(jsonData)}, nil
-
-}
+//
+//func (svc *UserService) GetProfile(userID int64) (gin.H, error) {
+//
+//	//savingAcc := FindSavingByUserID(userID)
+//	//checkingAcc := FindCheckingByUserID(userID)
+//	//loanAcc := FindLoanAccByUserID(userID)
+//	//studentLoanAcc := FindStudentLoanByUserID(userID)
+//	//homeLoanAcc := FindHomeLoanByUserID(userID)
+//
+//	//return gin.H{
+//	//
+//	//
+//	//	"Account" : gin.H{
+//	//		"savingAcc":      savingAcc,
+//	//		"checkingAcc":    checkingAcc,
+//	//		"loanAcc":        loanAcc,
+//	//		"studentLoanAcc": studentLoanAcc,
+//	//		"homeLoanAcc":    homeLoanAcc,
+//	//	},
+//	//}, nil
+//
+//	user := svc.userRepo.FindUserByUserID(userID)
+//	jsonData, _ := json.Marshal(user)
+//
+//	//for _, account := range user.Account {
+//	//	if account.AccountType == "S": {
+//	//		saving := svc.accountRepo.FindSavingByAccID(account.ID)
+//	//	} else if account.AccountType == "C": {
+//	//		checking := svc.accountRepo.FindCheckByAccID(account.ID)
+//	//	} else if
+//	//}
+//
+//	return gin.H{"data": string(jsonData)}, nil
+//
+//}

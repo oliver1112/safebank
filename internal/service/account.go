@@ -9,7 +9,7 @@ import (
 )
 
 type AccountService struct {
-	userRepo    *repository.UserRepository
+	UserRepo    *repository.UserRepository
 	AccountDao  *dao.AccountDAO
 	CheckingDao *dao.CheckingDAO
 	HomeLoanDao *dao.HomeLoanDAO
@@ -31,7 +31,7 @@ func NewAccountService(db *gorm.DB) *AccountService {
 	stuLoanDao := dao.NewStuLoanDao(db)
 
 	return &AccountService{
-		userRepo:    userRepo,
+		UserRepo:    userRepo,
 		AccountDao:  accountDao,
 		CheckingDao: checkingDao,
 		HomeLoanDao: homeLoanDao,
@@ -43,12 +43,12 @@ func NewAccountService(db *gorm.DB) *AccountService {
 
 func (svc *AccountService) GetAccount(ctx *gin.Context) ([]dao.Account, error) {
 	userID, _ := ctx.Get("userID")
-	accounts, err := svc.AccountDao.GetAccount(ctx, cast.ToInt64(userID))
+	accounts, err := svc.AccountDao.GetAccountList(ctx, cast.ToInt64(userID))
 	return accounts, err
 }
 
 func (svc *AccountService) CreateOrUpdateAccount(ctx *gin.Context, data interface{}) ([]dao.Account, error) {
 	id, _ := ctx.Get("userID")
-	accounts, err := svc.AccountDao.GetAccount(ctx, cast.ToInt64(id))
+	accounts, err := svc.AccountDao.GetAccountList(ctx, cast.ToInt64(id))
 	return accounts, err
 }

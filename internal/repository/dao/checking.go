@@ -28,9 +28,9 @@ func (cd *CheckingDAO) Insert(ctx context.Context, c Checking) error {
 	return err
 }
 
-func (cd *CheckingDAO) GetChecking(ctx *gin.Context, userId int64) (Checking, error) {
+func (cd *CheckingDAO) GetChecking(ctx *gin.Context, accountId int64) (Checking, error) {
 	var checking Checking
-	err := cd.db.WithContext(ctx).Where("user_id = ?", userId).First(&checking).Error
+	err := cd.db.WithContext(ctx).Where("account_id = ?", accountId).First(&checking).Error
 	//err := ud.db.WithContext(ctx).First(&u, "email = ?", email).Error
 	return checking, err
 }

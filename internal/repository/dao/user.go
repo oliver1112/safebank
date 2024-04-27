@@ -30,6 +30,13 @@ func (ud *UserDAO) FindByEmail(ctx context.Context, email string) (User, error) 
 	return u, err
 }
 
+func (ud *UserDAO) FindById(ctx context.Context, id int64) (User, error) {
+	var u User
+	err := ud.db.WithContext(ctx).Where("id = ?", id).First(&u).Error
+	//err := ud.db.WithContext(ctx).First(&u, "email = ?", email).Error
+	return u, err
+}
+
 func (ud *UserDAO) Insert(ctx context.Context, u User) error {
 	now := time.Now().UnixMilli()
 	u.Utime = now

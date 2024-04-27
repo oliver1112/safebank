@@ -44,7 +44,7 @@ func (u *UserHandler) RegisterRoutes(server *gin.Engine) {
 	// POST /users/edit
 	ug.POST("/edit", u.Edit)
 	// GET /users/profile
-	ug.GET("/profile", u.Profile)
+	//ug.GET("/profile", u.Profile)
 }
 
 func (u *UserHandler) SignUp(ctx *gin.Context) {
@@ -164,7 +164,7 @@ func (u *UserHandler) Login(ctx *gin.Context) {
 		Email    string `json:"email"`
 		Password string `json:"password"`
 	}
-	
+
 	type ResponseData struct {
 		UserToken string `json:"userToken"`
 	}
@@ -218,39 +218,39 @@ func (u *UserHandler) Edit(ctx *gin.Context) {
 
 }
 
-func (u *UserHandler) Profile(ctx *gin.Context) {
-
-	sess := sessions.Default(ctx)
-	id := sess.Get("userId")
-
-	if id == nil {
-		ctx.AbortWithStatus(http.StatusUnauthorized)
-		return
-	}
-
-	userID, ok := id.(int64)
-	if !ok {
-		ctx.String(http.StatusOK, "session error")
-		return
-	}
-
-	//println(useID)
-	userData, err := u.svc.GetProfile(userID)
-	if err != nil {
-		ctx.String(http.StatusOK, "no such user")
-		return
-	}
-
-	responseData := gin.H{
-		"status": 0,
-		// "data": userData
-		"data":   userData,
-		"errmsg": "",
-	}
-
-	// Return JSON response
-	ctx.JSON(200, responseData)
-}
+//func (u *UserHandler) Profile(ctx *gin.Context) {
+//
+//	sess := sessions.Default(ctx)
+//	id := sess.Get("userId")
+//
+//	if id == nil {
+//		ctx.AbortWithStatus(http.StatusUnauthorized)
+//		return
+//	}
+//
+//	userID, ok := id.(int64)
+//	if !ok {
+//		ctx.String(http.StatusOK, "session error")
+//		return
+//	}
+//
+//	//println(useID)
+//	userData, err := u.svc.GetProfile(userID)
+//	if err != nil {
+//		ctx.String(http.StatusOK, "no such user")
+//		return
+//	}
+//
+//	responseData := gin.H{
+//		"status": 0,
+//		// "data": userData
+//		"data":   userData,
+//		"errmsg": "",
+//	}
+//
+//	// Return JSON response
+//	ctx.JSON(200, responseData)
+//}
 
 func (u *UserHandler) AddSaving(ctx *gin.Context) {
 	type SavingReq struct {
