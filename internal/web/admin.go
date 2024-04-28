@@ -10,6 +10,7 @@ import (
 	"safebank/internal/lib"
 	"safebank/internal/repository/dao"
 	"safebank/internal/service"
+	"time"
 )
 
 type AdminHandler struct {
@@ -81,7 +82,9 @@ func (a *AdminHandler) Login(ctx *gin.Context) {
 
 	// Login success and set session
 	userToken := lib.UserToken{
-		UserID: user.ID,
+		UserID:    user.ID,
+		ExpiresAt: time.Now().Unix() + 3600*24,
+		IP:        ctx.ClientIP(),
 	}
 
 	responseData.AdminToken = userToken.EncodeToken()

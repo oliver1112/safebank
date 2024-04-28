@@ -17,7 +17,7 @@ type Account struct {
 	City        string `json:"city"`
 	State       string `json:"state"`
 	Zip         string `json:"zip"`
-	Apart       string `json:"party"`
+	Apart       string `json:"apart"`
 	AccountType string `json:"account_type"`
 	UserID      int64  `json:"user_id"`
 

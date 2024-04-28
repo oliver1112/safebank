@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"safebank/internal/lib"
 	"strings"
+	"time"
 )
 
 type LoginMiddlewareBuilder struct {
@@ -42,9 +43,9 @@ func (l *LoginMiddlewareBuilder) Build() gin.HandlerFunc {
 
 		userToken := lib.UserToken{}
 		userToken.DecodeToken(m["userToken"])
-
 		id := userToken.UserID
-		if id <= 0 {
+
+		if id <= 0 || userToken.ExpiresAt < time.Now().Unix() {
 			ctx.AbortWithStatus(http.StatusUnauthorized)
 			return
 		}

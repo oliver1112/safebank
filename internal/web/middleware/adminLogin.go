@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"safebank/internal/lib"
 	"strings"
+	"time"
 )
 
 type AdminLoginMiddlewareBuilder struct {
@@ -43,7 +44,7 @@ func (a *AdminLoginMiddlewareBuilder) Build() gin.HandlerFunc {
 		userToken.DecodeToken(m["adminToken"])
 
 		id := userToken.UserID
-		if id <= 0 {
+		if id <= 0 || userToken.ExpiresAt < time.Now().Unix() {
 			ctx.AbortWithStatus(http.StatusUnauthorized)
 			return
 		}

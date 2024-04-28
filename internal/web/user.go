@@ -10,6 +10,7 @@ import (
 	"safebank/internal/domain"
 	"safebank/internal/lib"
 	"safebank/internal/service"
+	"time"
 )
 
 const (
@@ -200,7 +201,9 @@ func (u *UserHandler) Login(ctx *gin.Context) {
 
 	// Login success and generate userToken
 	userToken := lib.UserToken{
-		UserID: user.ID,
+		UserID:    user.ID,
+		ExpiresAt: time.Now().Unix() + 3600*24,
+		IP:        ctx.ClientIP(),
 	}
 
 	responseData.UserToken = userToken.EncodeToken()
