@@ -103,6 +103,7 @@ func (a *AccountHandler) CreateOrUpdateSavingAccount(ctx *gin.Context) {
 			ErrorMsg: "db error",
 			Data:     responseData,
 		})
+		return
 	}
 
 	randomValue := 100.00 + rand.Float64()*100.00
@@ -123,6 +124,7 @@ func (a *AccountHandler) CreateOrUpdateSavingAccount(ctx *gin.Context) {
 			ErrorMsg: "db error",
 			Data:     responseData,
 		})
+		return
 	}
 
 	ctx.JSON(http.StatusOK, domain.Response{
@@ -130,6 +132,7 @@ func (a *AccountHandler) CreateOrUpdateSavingAccount(ctx *gin.Context) {
 		ErrorMsg: "",
 		Data:     saving,
 	})
+	return
 }
 
 func (a *AccountHandler) CreateOrUpdateCheckingAccount(ctx *gin.Context) {
@@ -173,6 +176,7 @@ func (a *AccountHandler) CreateOrUpdateCheckingAccount(ctx *gin.Context) {
 			ErrorMsg: "db error",
 			Data:     responseData,
 		})
+		return
 	}
 
 	// checking account
@@ -194,6 +198,7 @@ func (a *AccountHandler) CreateOrUpdateCheckingAccount(ctx *gin.Context) {
 			ErrorMsg: "db error",
 			Data:     responseData,
 		})
+		return
 	}
 
 	ctx.JSON(http.StatusOK, domain.Response{
@@ -247,6 +252,7 @@ func (a *AccountHandler) CreateOrUpdateLoan(ctx *gin.Context) {
 			ErrorMsg: "db error",
 			Data:     responseData,
 		})
+		return
 	}
 
 	randomValue := rand.Float64() * 50.00
@@ -270,6 +276,7 @@ func (a *AccountHandler) CreateOrUpdateLoan(ctx *gin.Context) {
 			ErrorMsg: "db error",
 			Data:     responseData,
 		})
+		return
 	}
 
 	ctx.JSON(http.StatusOK, domain.Response{
@@ -331,6 +338,7 @@ func (a *AccountHandler) CreateOrUpdateHomeLoan(ctx *gin.Context) {
 			ErrorMsg: "db error",
 			Data:     responseData,
 		})
+		return
 	}
 
 	randomValue := rand.Float64() * 50.00
@@ -354,6 +362,7 @@ func (a *AccountHandler) CreateOrUpdateHomeLoan(ctx *gin.Context) {
 			ErrorMsg: "db error",
 			Data:     responseData,
 		})
+		return
 	}
 
 	randomValue = rand.Float64() * 20.00
@@ -379,6 +388,7 @@ func (a *AccountHandler) CreateOrUpdateHomeLoan(ctx *gin.Context) {
 			ErrorMsg: "db error",
 			Data:     responseData,
 		})
+		return
 	}
 
 	ctx.JSON(http.StatusOK, domain.Response{
@@ -437,6 +447,7 @@ func (a *AccountHandler) CreateOrUpdateStuLoan(ctx *gin.Context) {
 			ErrorMsg: "db error",
 			Data:     responseData,
 		})
+		return
 	}
 
 	randomValue := rand.Float64() * 50.00
@@ -460,6 +471,7 @@ func (a *AccountHandler) CreateOrUpdateStuLoan(ctx *gin.Context) {
 			ErrorMsg: "db error",
 			Data:     responseData,
 		})
+		return
 	}
 
 	stuLoanData := dao.StuLoan{
@@ -478,6 +490,7 @@ func (a *AccountHandler) CreateOrUpdateStuLoan(ctx *gin.Context) {
 			ErrorMsg: "db error",
 			Data:     responseData,
 		})
+		return
 	}
 
 	ctx.JSON(http.StatusOK, domain.Response{

@@ -32,7 +32,6 @@ func NewHomeLoanDao(db *gorm.DB) *HomeLoanDAO {
 func (hd *HomeLoanDAO) GetHomeLoan(ctx *gin.Context, accountId int64) (HomeLoan, error) {
 	var homeLoan HomeLoan
 	err := hd.Db.WithContext(ctx).Where("account_id = ?", accountId).First(&homeLoan).Error
-	//err := ud.db.WithContext(ctx).First(&u, "email = ?", email).Error
 	return homeLoan, err
 }
 
@@ -42,6 +41,5 @@ func (hd *HomeLoanDAO) CreateOrUpdate(ctx *gin.Context, data HomeLoan) (HomeLoan
 	}
 	var homeLoan HomeLoan
 	err := hd.Db.Where(where).Assign(data).FirstOrCreate(&homeLoan).Error
-	//err := ud.db.WithContext(ctx).First(&u, "email = ?", email).Error
 	return homeLoan, err
 }

@@ -3,6 +3,7 @@ package web
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/spf13/cast"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 	"net/http"
@@ -39,6 +40,9 @@ func NewAdminHandler(db *gorm.DB) *AdminHandler {
 func (a *AdminHandler) RegisterRoutes(server *gin.Engine) {
 	adminRouterG := server.Group("/admin")
 	adminRouterG.POST("/login", a.Login)
+	adminRouterG.POST("/getaccountsbyemail", a.GetAccountsByEmail)
+	adminRouterG.POST("/getaccountbyaccountid", a.GetAccountsByAccountID)
+	adminRouterG.POST("/updateaccount", a.UpdateAccount)
 }
 
 func (a *AdminHandler) Login(ctx *gin.Context) {
@@ -94,5 +98,99 @@ func (a *AdminHandler) Login(ctx *gin.Context) {
 		Data:     responseData,
 	})
 
+	return
+}
+
+func (a *AdminHandler) GetAccountsByAccountID(ctx *gin.Context) {
+	type Req struct {
+		AccountID int64 `json:"account_id"`
+	}
+
+	var req Req
+	if err := ctx.Bind(&req); err != nil {
+		ctx.JSON(http.StatusOK, domain.Response{
+			Status:   -1,
+			ErrorMsg: "args error",
+		})
+		return
+	}
+
+	accountData, err := a.svc.AccountService.GetAccountsByAccountID(ctx, req.AccountID)
+	if err != nil {
+		ctx.JSON(http.StatusOK, domain.Response{
+			Status:   1,
+			ErrorMsg: cast.ToString(err),
+			Data:     accountData,
+		})
+		return
+	}
+	ctx.JSON(http.StatusOK, domain.Response{
+		Status:   0,
+		ErrorMsg: "",
+		Data:     accountData,
+	})
+	return
+}
+
+func (a *AdminHandler) GetAccountsByEmail(ctx *gin.Context) {
+	type Req struct {
+		Email string `json:"email"`
+	}
+
+	var req Req
+	if err := ctx.Bind(&req); err != nil {
+		ctx.JSON(http.StatusOK, domain.Response{
+			Status:   -1,
+			ErrorMsg: "args error",
+		})
+		return
+	}
+
+	accountData, err := a.svc.AccountService.GetAccountsByEmail(ctx, req.Email)
+	if err != nil {
+		ctx.JSON(http.StatusOK, domain.Response{
+			Status:   1,
+			ErrorMsg: cast.ToString(err),
+			Data:     accountData,
+		})
+		return
+	}
+	ctx.JSON(http.StatusOK, domain.Response{
+		Status:   0,
+		ErrorMsg: "",
+		Data:     accountData,
+	})
+	return
+}
+
+func (a *AdminHandler) UpdateAccount(ctx *gin.Context) {
+	type Req struct {
+		AccountID  int64                  `json:"account_id"`
+		UpdateData map[string]interface{} `json:"update_data"`
+	}
+
+	var req Req
+	if err := ctx.Bind(&req); err != nil {
+		ctx.JSON(http.StatusOK, domain.Response{
+			Status:   -1,
+			ErrorMsg: "args error",
+		})
+		return
+	}
+
+	isUpdate, err := a.svc.UpdateAccountInfo(ctx, req.AccountID, req.UpdateData)
+	if err != nil {
+		ctx.JSON(http.StatusOK, domain.Response{
+			Status:   1,
+			ErrorMsg: cast.ToString(err),
+			Data:     false,
+		})
+		return
+	}
+	ctx.JSON(http.StatusOK, domain.Response{
+		Status:   0,
+		ErrorMsg: "",
+		Data:     isUpdate,
+	})
 	return
 }

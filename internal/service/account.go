@@ -141,3 +141,54 @@ func (a *AccountService) GetAccountsByUserID(ctx *gin.Context, userID int64) (do
 
 	return info, err
 }
+
+func (a *AccountService) GetAccountsByEmail(ctx *gin.Context, email string) (domain.UserCenter, error) {
+	var info domain.UserCenter
+
+	userInfo, err := a.UserRepo.FindByEmail(ctx, email)
+	if err != nil {
+		return info, fmt.Errorf("system error 30")
+	}
+
+	return a.GetAccountsByUserID(ctx, userInfo.ID)
+}
+
+func (a *AccountService) GetAccountsByAccountID(ctx *gin.Context, accountID int64) (domain.UserCenter, error) {
+	var info domain.UserCenter
+
+	accountData, err := a.AccountDao.GetAccountByID(ctx, accountID)
+	if err != nil {
+		return info, fmt.Errorf("system error 30")
+	}
+
+	if accountData.ID <= 0 {
+		return info, nil
+	}
+
+	allAccountData, err := a.GetAccountsByUserID(ctx, accountData.UserID)
+	if err != nil {
+		return info, nil
+	}
+	// only reserve account
+	if allAccountData.AccountInfo.SavingAccount["account_id"] != accountID {
+		allAccountData.AccountInfo.SavingAccount = nil
+	}
+
+	if allAccountData.AccountInfo.CheckingAccount["account_id"] != accountID {
+		allAccountData.AccountInfo.CheckingAccount = nil
+	}
+
+	if allAccountData.AccountInfo.StudentLoanAccount["account_id"] != accountID {
+		allAccountData.AccountInfo.StudentLoanAccount = nil
+	}
+
+	if allAccountData.AccountInfo.HomeLoanAccount["account_id"] != accountID {
+		allAccountData.AccountInfo.HomeLoanAccount = nil
+	}
+
+	if allAccountData.AccountInfo.PersonalLoanAccount["account_id"] != accountID {
+		allAccountData.AccountInfo.PersonalLoanAccount = nil
+	}
+
+	return allAccountData, nil
+}

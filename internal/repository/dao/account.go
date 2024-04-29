@@ -7,7 +7,7 @@ import (
 )
 
 type AccountDAO struct {
-	db *gorm.DB
+	Db *gorm.DB
 }
 
 type Account struct {
@@ -27,27 +27,27 @@ type Account struct {
 
 func NewAccountDao(db *gorm.DB) *AccountDAO {
 	return &AccountDAO{
-		db: db,
+		Db: db,
 	}
 }
 
 func (a *AccountDAO) GetAccountList(ctx *gin.Context, userId int64) ([]Account, error) {
 	var accounts []Account
-	err := a.db.WithContext(ctx).Where("user_id = ?", userId).Find(&accounts).Error
+	err := a.Db.WithContext(ctx).Where("user_id = ?", userId).Find(&accounts).Error
 	//err := ud.db.WithContext(ctx).First(&u, "email = ?", email).Error
 	return accounts, err
 }
 
 func (a *AccountDAO) GetAccountByID(ctx *gin.Context, accountID int64) (Account, error) {
 	var account Account
-	err := a.db.WithContext(ctx).Where("id = ?", accountID).First(&account).Error
+	err := a.Db.WithContext(ctx).Where("id = ?", accountID).First(&account).Error
 	//err := ud.db.WithContext(ctx).First(&u, "email = ?", email).Error
 	return account, err
 }
 
 func (a *AccountDAO) GetAccountWithType(ctx *gin.Context, userId int64, accountType string) (Account, error) {
 	var account Account
-	err := a.db.WithContext(ctx).Where("user_id = ? and account_type = ?", userId, accountType).Find(&account).Error
+	err := a.Db.WithContext(ctx).Where("user_id = ? and account_type = ?", userId, accountType).Find(&account).Error
 	//err := ud.db.WithContext(ctx).First(&u, "email = ?", email).Error
 	return account, err
 }
@@ -58,7 +58,7 @@ func (a *AccountDAO) CreateOrUpdate(ctx *gin.Context, data Account) (Account, er
 		UserID:      cast.ToInt64(data.UserID),
 	}
 	var account Account
-	err := a.db.Where(where).Assign(data).FirstOrCreate(&account).Error
+	err := a.Db.Where(where).Assign(data).FirstOrCreate(&account).Error
 	//err := ud.db.WithContext(ctx).First(&u, "email = ?", email).Error
 	return account, err
 }

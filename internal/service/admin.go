@@ -107,6 +107,11 @@ func (a *AdminService) UpdateAccountInfo(ctx *gin.Context, AccountID int64, upda
 		accountData.Zip = cast.ToString(value)
 	}
 
+	if value, ok := updateData["apart"]; ok {
+		accountData.Apart = cast.ToString(value)
+	}
+
+	a.AccountDao.Db.Where(&dao.Account{ID: accountData.ID}).Updates(&accountData)
 	if accountData.AccountType == "C" {
 		checkingData, err := a.CheckingDao.GetChecking(ctx, accountData.ID)
 		if err != nil {
@@ -122,7 +127,7 @@ func (a *AdminService) UpdateAccountInfo(ctx *gin.Context, AccountID int64, upda
 		}
 
 		checkingData.Account = accountData
-		a.CheckingDao.Db.Save(&checkingData)
+		a.CheckingDao.Db.Where(&dao.Checking{AccountID: accountData.ID}).Updates(&checkingData)
 	} else if accountData.AccountType == "S" {
 		savingData, err := a.SavingDao.GetSaving(ctx, accountData.ID)
 		if err != nil {
@@ -138,30 +143,97 @@ func (a *AdminService) UpdateAccountInfo(ctx *gin.Context, AccountID int64, upda
 		}
 
 		savingData.Account = accountData
-		a.SavingDao.Db.Save(&savingData)
+		a.SavingDao.Db.Where(&dao.Saving{AccountID: accountData.ID}).Updates(&savingData)
 	} else if accountData.AccountType == "L" {
 		loanInfo, err := a.LoanDao.GetByAccountID(ctx, AccountID)
 		if err != nil {
 			return false, err
 		}
-		loanInfo.Account = accountData
 
+		if value, ok := updateData["rate"]; ok {
+			loanInfo.Rate = cast.ToFloat64(value)
+		}
+
+		if value, ok := updateData["amount"]; ok {
+			loanInfo.Amount = cast.ToFloat64(value)
+		}
+
+		if value, ok := updateData["month"]; ok {
+			loanInfo.Month = cast.ToInt(value)
+		}
+
+		if value, ok := updateData["payment"]; ok {
+			loanInfo.Payment = cast.ToFloat64(value)
+		}
+
+		a.LoanDao.Db.Where(&dao.Loan{AccountID: accountData.ID}).Updates(&loanInfo)
 		if loanInfo.Type == "H" {
 			homeLoanInfo, err := a.HomeLoanDao.GetHomeLoan(ctx, AccountID)
 			if err != nil {
 				return false, err
 			}
-			homeLoanInfo.Loan = loanInfo
-			a.HomeLoanDao.Db.Save(&homeLoanInfo)
+
+			if value, ok := updateData["build_year"]; ok {
+				homeLoanInfo.BuildYear = cast.ToInt(value)
+			}
+
+			if value, ok := updateData["insur_acc_num"]; ok {
+				homeLoanInfo.InsurAccNum = cast.ToInt(value)
+			}
+
+			if value, ok := updateData["insur_name"]; ok {
+				homeLoanInfo.InsurName = cast.ToString(value)
+			}
+
+			if value, ok := updateData["insur_street"]; ok {
+				homeLoanInfo.InsurStreet = cast.ToString(value)
+			}
+
+			if value, ok := updateData["insur_city"]; ok {
+				homeLoanInfo.InsurCity = cast.ToString(value)
+			}
+
+			if value, ok := updateData["insur_state"]; ok {
+				homeLoanInfo.InsurState = cast.ToString(value)
+			}
+
+			if value, ok := updateData["insur_zip"]; ok {
+				homeLoanInfo.InsurZip = cast.ToInt(value)
+			}
+
+			if value, ok := updateData["year_insur_prm"]; ok {
+				homeLoanInfo.YearInsurPrm = cast.ToFloat64(value)
+			}
+
+			a.HomeLoanDao.Db.Where(&dao.HomeLoan{AccountID: homeLoanInfo.AccountID}).Updates(&homeLoanInfo)
 		} else if loanInfo.Type == "S" {
 			studentLoanInfo, err := a.StuLoanDao.GetStuLoan(ctx, AccountID)
 			if err != nil {
 				return false, err
 			}
-			studentLoanInfo.Loan = loanInfo
-			a.StuLoanDao.Db.Save(&studentLoanInfo)
+
+			if value, ok := updateData["edu_institute"]; ok {
+				studentLoanInfo.EduInstitute = cast.ToString(value)
+			}
+
+			if value, ok := updateData["student_id"]; ok {
+				studentLoanInfo.StudentID = cast.ToInt(value)
+			}
+
+			if value, ok := updateData["grad_status"]; ok {
+				studentLoanInfo.GradStatus = cast.ToString(value)
+			}
+
+			if value, ok := updateData["expect_grad_month"]; ok {
+				studentLoanInfo.ExpectGradMonth = cast.ToInt(value)
+			}
+
+			if value, ok := updateData["expect_grad_year"]; ok {
+				studentLoanInfo.ExpectGradYear = cast.ToInt(value)
+			}
+
+			a.StuLoanDao.Db.Where(&dao.StuLoan{AccountID: studentLoanInfo.AccountID}).Updates(&studentLoanInfo)
 		} else if loanInfo.Type == "L" {
-			a.LoanDao.Db.Save(&loanInfo)
 		}
 	}
 
