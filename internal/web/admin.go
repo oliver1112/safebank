@@ -43,6 +43,7 @@ func (a *AdminHandler) RegisterRoutes(server *gin.Engine) {
 	adminRouterG.POST("/getaccountsbyemail", a.GetAccountsByEmail)
 	adminRouterG.POST("/getaccountbyaccountid", a.GetAccountsByAccountID)
 	adminRouterG.POST("/updateaccount", a.UpdateAccount)
+	adminRouterG.POST("/dashboard", a.DashBoard)
 }
 
 func (a *AdminHandler) Login(ctx *gin.Context) {
@@ -191,6 +192,54 @@ func (a *AdminHandler) UpdateAccount(ctx *gin.Context) {
 		Status:   0,
 		ErrorMsg: "",
 		Data:     isUpdate,
+	})
+	return
+}
+
+func (a *AdminHandler) DashBoard(ctx *gin.Context) {
+	response := make(map[string]interface{})
+	var totalUserNum int64
+	var savingAccountNum int64
+	var checkingAccountNum int64
+	var homeLoanAccountNum int64
+	var studentLoanAccountNum int64
+	var personalLoanAccountNum int64
+	type TotalSavingDeposit struct {
+		Total int64
+	}
+	type TotalCheckingDeposit struct {
+		Total int64
+	}
+	type TotalLoanAmount struct {
+		Total int64
+	}
+	var totalSavingDeposit TotalSavingDeposit
+	var totalCheckingDeposit TotalCheckingDeposit
+	var totalLoanAmount TotalLoanAmount
+
+	a.svc.AccountDao.Db.Model(&dao.User{}).Count(&totalUserNum)
+	a.svc.AccountDao.Db.Model(&dao.Account{}).Where(&dao.Account{AccountType: "S"}).Count(&savingAccountNum)
+	a.svc.AccountDao.Db.Model(&dao.Account{}).Where(&dao.Account{AccountType: "C"}).Count(&checkingAccountNum)
+	a.svc.LoanDao.Db.Model(&dao.Loan{}).Where(&dao.Loan{Type: "H"}).Count(&homeLoanAccountNum)
+	a.svc.LoanDao.Db.Model(&dao.Loan{}).Where(&dao.Loan{Type: "S"}).Count(&studentLoanAccountNum)
+	a.svc.LoanDao.Db.Model(&dao.Loan{}).Where(&dao.Loan{Type: "L"}).Count(&personalLoanAccountNum)
+	a.svc.SavingDao.Db.Model(&dao.Saving{}).Select("sum(amount) as total").Find(&totalSavingDeposit)
+	a.svc.CheckingDao.Db.Model(&dao.Checking{}).Select("sum(amount) as total").Find(&totalCheckingDeposit)
+	a.svc.LoanDao.Db.Model(&dao.Loan{}).Select("sum(amount) as total").Find(&totalLoanAmount)
+
+	response["saving_account_num"] = savingAccountNum
+	response["checking_account_num"] = checkingAccountNum
+	response["home_loan_account_num"] = homeLoanAccountNum
+	response["student_loan_account_num"] = studentLoanAccountNum
+	response["personal_loan_account_num"] = personalLoanAccountNum
+	response["total_saving_deposit"] = totalSavingDeposit.Total
+	response["total_checking_deposit"] = totalCheckingDeposit.Total
+	response["total_loan_amount"] = totalLoanAmount.Total
+
+	ctx.JSON(http.StatusOK, domain.Response{
+		Status:   0,
+		ErrorMsg: "",
+		Data:     response,
 	})
 	return
 }

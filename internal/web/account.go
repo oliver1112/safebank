@@ -474,9 +474,15 @@ func (a *AccountHandler) CreateOrUpdateStuLoan(ctx *gin.Context) {
 		return
 	}
 
+	loan, err = a.svc.LoanDao.CreateOrUpdate(ctx, loanData)
+
+	instituteData := dao.Institute{
+		InstituteName: req.EduInstitute,
+	}
+	institute, _ := a.svc.InstituteDao.CreateOrUpdate(ctx, instituteData)
 	stuLoanData := dao.StuLoan{
 		Loan:            loan,
-		EduInstitute:    req.EduInstitute,
+		Institute:       institute,
 		StudentID:       cast.ToInt(req.StudentID),
 		GradStatus:      req.GradStatus,
 		ExpectGradMonth: cast.ToInt(req.ExpectGradMonth),

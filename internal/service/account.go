@@ -12,13 +12,14 @@ import (
 )
 
 type AccountService struct {
-	UserRepo    *repository.UserRepository
-	AccountDao  *dao.AccountDAO
-	CheckingDao *dao.CheckingDAO
-	HomeLoanDao *dao.HomeLoanDAO
-	LoanDao     *dao.LoanDAO
-	SavingDao   *dao.SavingDAO
-	StuLoanDao  *dao.StuLoanDAO
+	UserRepo     *repository.UserRepository
+	AccountDao   *dao.AccountDAO
+	CheckingDao  *dao.CheckingDAO
+	HomeLoanDao  *dao.HomeLoanDAO
+	LoanDao      *dao.LoanDAO
+	SavingDao    *dao.SavingDAO
+	StuLoanDao   *dao.StuLoanDAO
+	InstituteDao *dao.InstituteDAO
 }
 
 func NewAccountService(db *gorm.DB) *AccountService {
@@ -32,15 +33,17 @@ func NewAccountService(db *gorm.DB) *AccountService {
 	loanDao := dao.NewLoanDao(db)
 	savingDao := dao.NewSavingDao(db)
 	stuLoanDao := dao.NewStuLoanDao(db)
+	instituteDao := dao.NewInstituteDao(db)
 
 	return &AccountService{
-		UserRepo:    userRepo,
-		AccountDao:  accountDao,
-		CheckingDao: checkingDao,
-		HomeLoanDao: homeLoanDao,
-		LoanDao:     loanDao,
-		SavingDao:   savingDao,
-		StuLoanDao:  stuLoanDao,
+		UserRepo:     userRepo,
+		AccountDao:   accountDao,
+		CheckingDao:  checkingDao,
+		HomeLoanDao:  homeLoanDao,
+		LoanDao:      loanDao,
+		SavingDao:    savingDao,
+		StuLoanDao:   stuLoanDao,
+		InstituteDao: instituteDao,
 	}
 }
 
@@ -130,6 +133,12 @@ func (a *AccountService) GetAccountsByUserID(ctx *gin.Context, userID int64) (do
 				err = lib.StructToMapSingleD2(studentLoanData, "json", &accountDetail)
 				if err != nil {
 					return info, fmt.Errorf("system error 11")
+				}
+
+				instituteData, err := a.InstituteDao.GetByID(ctx, studentLoanData.InstituteID)
+				err = lib.StructToMapSingleD2(instituteData, "json", &accountDetail)
+				if err != nil {
+					return info, fmt.Errorf("system error 12")
 				}
 				data.StudentLoanAccount = accountDetail
 			}

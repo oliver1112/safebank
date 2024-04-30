@@ -19,6 +19,7 @@ type AdminService struct {
 	SavingDao      *dao.SavingDAO
 	StuLoanDao     *dao.StuLoanDAO
 	EmployeeDao    *dao.EmployeeDAO
+	InstituteDao   *dao.InstituteDAO
 	AccountService *AccountService
 }
 
@@ -34,6 +35,7 @@ func NewAdminService(db *gorm.DB) *AdminService {
 	savingDao := dao.NewSavingDao(db)
 	stuLoanDao := dao.NewStuLoanDao(db)
 	employeeDao := dao.NewEmployeeDao(db)
+	instituteDao := dao.NewInstituteDao(db)
 	accountService := NewAccountService(db)
 
 	return &AdminService{
@@ -45,6 +47,7 @@ func NewAdminService(db *gorm.DB) *AdminService {
 		SavingDao:      savingDao,
 		StuLoanDao:     stuLoanDao,
 		EmployeeDao:    employeeDao,
+		InstituteDao:   instituteDao,
 		AccountService: accountService,
 	}
 }
@@ -213,7 +216,11 @@ func (a *AdminService) UpdateAccountInfo(ctx *gin.Context, AccountID int64, upda
 			}
 
 			if value, ok := updateData["edu_institute"]; ok {
-				studentLoanInfo.EduInstitute = cast.ToString(value)
+				instituteData := dao.Institute{
+					InstituteName: cast.ToString(value),
+				}
+				institute, _ := a.InstituteDao.CreateOrUpdate(ctx, instituteData)
+				studentLoanInfo.InstituteID = institute.InstituteID
 			}
 
 			if value, ok := updateData["student_id"]; ok {

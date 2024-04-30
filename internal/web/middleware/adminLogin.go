@@ -35,7 +35,7 @@ func (a *AdminLoginMiddlewareBuilder) Build() gin.HandlerFunc {
 
 		m := map[string]string{}
 		_ = json.Unmarshal(data, &m)
-		fmt.Printf("id: %d\n", m["id"])
+		fmt.Printf("adminToken: %s\n", m["adminToken"])
 
 		// rewrite data to body
 		ctx.Request.Body = ioutil.NopCloser(bytes.NewBuffer(data))
