@@ -402,7 +402,7 @@ func (a *AccountHandler) CreateOrUpdateStuLoan(ctx *gin.Context) {
 	type Req struct {
 		loanAmount      float64 `json:"lamount"`
 		loanMonth       int     `json:"lmonth"`
-		EduInstitute    string  `json:"eduinsititute"`
+		EduInstitute    string  `json:"eduinstitute"`
 		StudentID       string  `json:"studentid"`
 		GradStatus      string  `json:"grad_status"`
 		ExpectGradMonth string  `json:"graduationMonth"`
