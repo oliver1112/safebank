@@ -371,6 +371,7 @@ func (a *AccountHandler) CreateOrUpdateHomeLoan(ctx *gin.Context) {
 
 	homeLoanData := dao.HomeLoan{
 		Loan:         loan,
+		AccountID:    loan.AccountID,
 		BuildYear:    cast.ToInt(req.buildYear),
 		InsurAccNum:  cast.ToInt(req.InsurAccNum),
 		InsurName:    req.InsurName,
@@ -482,6 +483,7 @@ func (a *AccountHandler) CreateOrUpdateStuLoan(ctx *gin.Context) {
 	institute, _ := a.svc.InstituteDao.CreateOrUpdate(ctx, instituteData)
 	stuLoanData := dao.StuLoan{
 		Loan:            loan,
+		AccountID:       loan.AccountID,
 		Institute:       institute,
 		StudentID:       cast.ToInt(req.StudentID),
 		GradStatus:      req.GradStatus,
