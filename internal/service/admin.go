@@ -246,3 +246,13 @@ func (a *AdminService) UpdateAccountInfo(ctx *gin.Context, AccountID int64, upda
 
 	return true, nil
 }
+
+func (a *AdminService) DeleteAccountByID(ctx *gin.Context, accountID int64) {
+	// try to delete account
+	a.HomeLoanDao.Db.Where(&dao.HomeLoan{AccountID: accountID}).Delete(&dao.HomeLoan{AccountID: accountID})
+	a.StuLoanDao.Db.Where(&dao.StuLoan{AccountID: accountID}).Delete(&dao.StuLoan{AccountID: accountID})
+	a.LoanDao.Db.Delete(&dao.Loan{AccountID: accountID})
+	a.SavingDao.Db.Delete(&dao.Saving{AccountID: accountID})
+	a.CheckingDao.Db.Delete(&dao.Checking{AccountID: accountID})
+	a.AccountDao.Db.Delete(&dao.Account{ID: accountID})
+}

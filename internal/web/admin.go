@@ -44,6 +44,7 @@ func (a *AdminHandler) RegisterRoutes(server *gin.Engine) {
 	adminRouterG.POST("/getaccountbyaccountid", a.GetAccountsByAccountID)
 	adminRouterG.POST("/updateaccount", a.UpdateAccount)
 	adminRouterG.POST("/dashboard", a.DashBoard)
+	adminRouterG.POST("/deleteaccount", a.DeleteAccount)
 }
 
 func (a *AdminHandler) Login(ctx *gin.Context) {
@@ -240,6 +241,29 @@ func (a *AdminHandler) DashBoard(ctx *gin.Context) {
 		Status:   0,
 		ErrorMsg: "",
 		Data:     response,
+	})
+	return
+}
+
+func (a *AdminHandler) DeleteAccount(ctx *gin.Context) {
+	type Req struct {
+		AccountID int64 `json:"account_id"`
+	}
+
+	var req Req
+	if err := ctx.Bind(&req); err != nil {
+		ctx.JSON(http.StatusOK, domain.Response{
+			Status:   -1,
+			ErrorMsg: "args error",
+		})
+		return
+	}
+
+	a.svc.DeleteAccountByID(ctx, req.AccountID)
+
+	ctx.JSON(http.StatusOK, domain.Response{
+		Status:   0,
+		ErrorMsg: "",
 	})
 	return
 }
