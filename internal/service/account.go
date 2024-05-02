@@ -111,6 +111,10 @@ func (a *AccountService) GetAccountsByUserID(ctx *gin.Context, userID int64) (do
 			loanData.Account = account
 
 			if loanData.Type == "L" {
+				err = lib.StructToMapSingleD2(loanData, "json", &accountDetail)
+				if err != nil {
+					return info, fmt.Errorf("system error 13")
+				}
 				data.PersonalLoanAccount = accountDetail
 			} else if loanData.Type == "H" {
 				homeLoanData, err := a.HomeLoanDao.GetHomeLoan(ctx, account.ID)
