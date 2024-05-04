@@ -206,13 +206,13 @@ func (a *AdminHandler) DashBoard(ctx *gin.Context) {
 	var studentLoanAccountNum int64
 	var personalLoanAccountNum int64
 	type TotalSavingDeposit struct {
-		Total int64
+		Total float64
 	}
 	type TotalCheckingDeposit struct {
 		Total int64
 	}
 	type TotalLoanAmount struct {
-		Total int64
+		Total float64
 	}
 	var totalSavingDeposit TotalSavingDeposit
 	var totalCheckingDeposit TotalCheckingDeposit
