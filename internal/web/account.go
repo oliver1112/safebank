@@ -210,8 +210,8 @@ func (a *AccountHandler) CreateOrUpdateCheckingAccount(ctx *gin.Context) {
 
 func (a *AccountHandler) CreateOrUpdateLoan(ctx *gin.Context) {
 	type Req struct {
-		loanAmount float64 `json:"lamount"`
-		loanMonth  int     `json:"lmonth"`
+		LoanAmount float64 `json:"lamount"`
+		LoanMonth  int     `json:"lmonth"`
 		Street     string  `json:"address"`
 		Apart      string  `json:"address2"`
 		Country    string  `json:"country"`
@@ -262,9 +262,9 @@ func (a *AccountHandler) CreateOrUpdateLoan(ctx *gin.Context) {
 	loanData := dao.Loan{
 		AccountID: account.ID,
 		Rate:      randomRate,
-		Amount:    req.loanAmount,
+		Amount:    req.LoanAmount,
 		Account:   account,
-		Month:     req.loanMonth,
+		Month:     req.LoanMonth,
 		Payment:   0,
 		Type:      "L",
 	}
@@ -288,9 +288,9 @@ func (a *AccountHandler) CreateOrUpdateLoan(ctx *gin.Context) {
 
 func (a *AccountHandler) CreateOrUpdateHomeLoan(ctx *gin.Context) {
 	type Req struct {
-		loanAmount   float64 `json:"lamount"`
-		loanMonth    int     `json:"lmonth"`
-		buildYear    string  `json:"buildYear"`
+		LoanAmount   float64 `json:"lamount"`
+		LoanMonth    int     `json:"lmonth"`
+		BuildYear    string  `json:"BuildYear"`
 		InsurAccNum  string  `json:"insu_acc_no"`
 		InsurName    string  `json:"insu_name"`
 		InsurCountry string  `json:"insu_country"`
@@ -348,9 +348,9 @@ func (a *AccountHandler) CreateOrUpdateHomeLoan(ctx *gin.Context) {
 	loanData := dao.Loan{
 		AccountID: account.ID,
 		Rate:      randomRate,
-		Amount:    req.loanAmount,
+		Amount:    req.LoanAmount,
 		Account:   account,
-		Month:     req.loanMonth,
+		Month:     req.LoanMonth,
 		Payment:   0,
 		Type:      "H",
 	}
@@ -372,7 +372,7 @@ func (a *AccountHandler) CreateOrUpdateHomeLoan(ctx *gin.Context) {
 	homeLoanData := dao.HomeLoan{
 		Loan:         loan,
 		AccountID:    loan.AccountID,
-		BuildYear:    cast.ToInt(req.buildYear),
+		BuildYear:    cast.ToInt(req.BuildYear),
 		InsurAccNum:  cast.ToInt(req.InsurAccNum),
 		InsurName:    req.InsurName,
 		InsurStreet:  req.InsurStreet,
@@ -401,8 +401,8 @@ func (a *AccountHandler) CreateOrUpdateHomeLoan(ctx *gin.Context) {
 
 func (a *AccountHandler) CreateOrUpdateStuLoan(ctx *gin.Context) {
 	type Req struct {
-		loanAmount      float64 `json:"lamount"`
-		loanMonth       int     `json:"lmonth"`
+		LoanAmount      float64 `json:"lamount"`
+		LoanMonth       int     `json:"lmonth"`
 		EduInstitute    string  `json:"eduinstitute"`
 		StudentID       string  `json:"studentid"`
 		GradStatus      string  `json:"grad_status"`
@@ -458,9 +458,9 @@ func (a *AccountHandler) CreateOrUpdateStuLoan(ctx *gin.Context) {
 	loanData := dao.Loan{
 		AccountID: account.ID,
 		Rate:      randomRate,
-		Amount:    req.loanAmount,
+		Amount:    req.LoanAmount,
 		Account:   account,
-		Month:     req.loanMonth,
+		Month:     req.LoanMonth,
 		Payment:   0,
 		Type:      "S",
 	}

@@ -28,6 +28,10 @@ type StuLoan struct {
 	ExpectGradYear  int    `json:"expect_grad_year"`
 }
 
+func (StuLoan) TableName() string {
+	return "wsj_stuloan"
+}
+
 func (sd *StuLoanDAO) GetStuLoan(ctx *gin.Context, accountID int64) (StuLoan, error) {
 	var stuLoan StuLoan
 	err := sd.Db.WithContext(ctx).Where("account_id = ?", accountID).First(&stuLoan).Error

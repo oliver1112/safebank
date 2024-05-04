@@ -19,6 +19,10 @@ type Loan struct {
 	Type      string  `json:"type"`
 }
 
+func (Loan) TableName() string {
+	return "wsj_loan"
+}
+
 func NewLoanDao(db *gorm.DB) *LoanDAO {
 	return &LoanDAO{
 		Db: db,

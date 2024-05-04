@@ -20,6 +20,10 @@ type Institute struct {
 	InstituteName string `gorm:"unique" json:"edu_institute"`
 }
 
+func (Institute) TableName() string {
+	return "wsj_institute"
+}
+
 func (i *InstituteDAO) GetByID(ctx *gin.Context, ID int64) (Institute, error) {
 	var institute Institute
 	err := i.Db.WithContext(ctx).Where(&Institute{InstituteID: ID}).First(&institute).Error

@@ -25,6 +25,10 @@ type Employee struct {
 	Utime    int64  `json:"utime"`
 }
 
+func (Employee) TableName() string {
+	return "wsj_employee"
+}
+
 type EmployeeDAO struct {
 	db *gorm.DB
 }

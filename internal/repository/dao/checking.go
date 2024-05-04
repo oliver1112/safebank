@@ -17,6 +17,10 @@ type Checking struct {
 	Amount        int64   `json:"amount"`
 }
 
+func (Checking) TableName() string {
+	return "wsj_checking"
+}
+
 func NewCheckingDao(db *gorm.DB) *CheckingDAO {
 	return &CheckingDAO{
 		Db: db,

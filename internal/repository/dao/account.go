@@ -25,6 +25,10 @@ type Account struct {
 	Utime int64 `json:"utime"`
 }
 
+func (Account) TableName() string {
+	return "wsj_account"
+}
+
 func NewAccountDao(db *gorm.DB) *AccountDAO {
 	return &AccountDAO{
 		Db: db,

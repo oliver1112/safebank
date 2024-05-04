@@ -74,3 +74,7 @@ type User struct {
 
 	Account []Account
 }
+
+func (User) TableName() string {
+	return "wsj_user"
+}

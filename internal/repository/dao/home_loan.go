@@ -23,6 +23,10 @@ type HomeLoan struct {
 	YearInsurPrm float64 `json:"year_insur_prm"`
 }
 
+func (HomeLoan) TableName() string {
+	return "wsj_homeloan"
+}
+
 func NewHomeLoanDao(db *gorm.DB) *HomeLoanDAO {
 	return &HomeLoanDAO{
 		Db: db,

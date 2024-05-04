@@ -17,6 +17,10 @@ type Saving struct {
 	Amount       float64 `json:"amount"`
 }
 
+func (Saving) TableName() string {
+	return "wsj_saving"
+}
+
 func NewSavingDao(db *gorm.DB) *SavingDAO {
 	return &SavingDAO{
 		Db: db,
