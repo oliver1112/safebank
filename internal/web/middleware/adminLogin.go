@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/goccy/go-json"
+	"github.com/spf13/cast"
 	"io/ioutil"
 	"net/http"
 	"safebank/internal/lib"
@@ -33,15 +34,15 @@ func (a *AdminLoginMiddlewareBuilder) Build() gin.HandlerFunc {
 		}
 		fmt.Printf("data: %v\n", string(data))
 
-		m := map[string]string{}
+		m := make(map[string]interface{})
 		_ = json.Unmarshal(data, &m)
-		fmt.Printf("adminToken: %s\n", m["adminToken"])
+		fmt.Printf("adminToken: %s\n", cast.ToString(m["adminToken"]))
 
 		// rewrite data to body
 		ctx.Request.Body = ioutil.NopCloser(bytes.NewBuffer(data))
 
 		userToken := lib.UserToken{}
-		userToken.DecodeToken(m["adminToken"])
+		userToken.DecodeToken(cast.ToString(m["adminToken"]))
 
 		id := userToken.UserID
 		if id <= 0 || userToken.ExpiresAt < time.Now().Unix() {
