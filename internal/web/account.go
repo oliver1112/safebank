@@ -108,9 +108,9 @@ func (a *AccountHandler) CreateOrUpdateSavingAccount(ctx *gin.Context) {
 		return
 	}
 
-	randomValue := 100.00 + rand.Float64()*100.00
+	randomValue := 100 + rand.Intn(1399)
 	// Truncate to two decimal places
-	randomRate := float64(int(randomValue*100)) / 100
+	randomRate := float64(randomValue) / 100
 
 	savingData := dao.Saving{
 		AccountID:    account.ID,
