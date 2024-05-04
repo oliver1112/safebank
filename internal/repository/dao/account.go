@@ -21,8 +21,8 @@ type Account struct {
 	AccountType string `json:"account_type"`
 	UserID      int64  `json:"user_id"`
 
-	Ctime int64 `json:"ctime"`
-	Utime int64 `json:"utime"`
+	Ctime int64 `gorm:"autoUpdateTime" json:"ctime"`
+	Utime int64 `gorm:"autoCreateTime" json:"utime"`
 }
 
 func (Account) TableName() string {
