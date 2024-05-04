@@ -35,6 +35,8 @@ func (a *AccountHandler) RegisterRoutes(server *gin.Engine) {
 	ug.POST("/addstudentloan", a.CreateOrUpdateStuLoan)
 
 	ug.POST("/usercenter", a.UserCenter)
+	ug.POST("/transaction", a.Transaction)
+	ug.POST("/gettransactions", a.GetTransactions)
 	//ug.GET("/checking", a.FindCheckingAccount)
 	//ug.GET("/loan", a.FindLoan)
 	//ug.GET("/homeloan", a.FindHomeLoan)
@@ -505,5 +507,139 @@ func (a *AccountHandler) CreateOrUpdateStuLoan(ctx *gin.Context) {
 		Status:   0,
 		ErrorMsg: "",
 		Data:     stuLoan,
+	})
+}
+
+func (a *AccountHandler) Transaction(ctx *gin.Context) {
+	type Req struct {
+		FromAccountID int64 `json:"from_account_id"`
+		ToAccountID   int64 `json:"to_account_id"`
+		Amount        int64 `json:"amount"`
+	}
+
+	var req Req
+	var responseData interface{}
+
+	if err := ctx.Bind(&req); err != nil {
+		ctx.JSON(http.StatusOK, domain.Response{
+			Status:   -1,
+			ErrorMsg: "Args error",
+			Data:     responseData,
+		})
+		return
+	}
+
+	if req.ToAccountID == req.FromAccountID {
+		ctx.JSON(http.StatusOK, domain.Response{
+			Status:   1,
+			ErrorMsg: "Can't transfer to a same account.",
+		})
+		return
+	}
+
+	userId, _ := ctx.Get("userID")
+
+	accountInfo, err := a.svc.AccountDao.GetAccountByID(ctx, req.FromAccountID)
+	if err != nil || accountInfo.ID == 0 {
+		ctx.JSON(http.StatusOK, domain.Response{
+			Status:   2,
+			ErrorMsg: "The account used for transfer does not exist.",
+		})
+		return
+	}
+
+	accountToInfo, err := a.svc.AccountDao.GetAccountByID(ctx, req.ToAccountID)
+	if err != nil || accountToInfo.ID == 0 {
+		ctx.JSON(http.StatusOK, domain.Response{
+			Status:   3,
+			ErrorMsg: "The account transfer to does not exist.",
+		})
+		return
+	}
+
+	if accountInfo.UserID != userId {
+		ctx.JSON(http.StatusOK, domain.Response{
+			Status:   4,
+			ErrorMsg: "You are not the owner of this account.",
+		})
+		return
+	}
+
+	if accountInfo.AccountType == "L" {
+		ctx.JSON(http.StatusOK, domain.Response{
+			Status:   5,
+			ErrorMsg: "The type of this account is not supported.",
+		})
+		return
+	}
+
+	if accountInfo.AccountType == "S" {
+		savingInfo, _ := a.svc.SavingDao.GetSaving(ctx, req.FromAccountID)
+		if savingInfo.Amount < req.Amount {
+			ctx.JSON(http.StatusOK, domain.Response{
+				Status:   6,
+				ErrorMsg: "The deposit of account is too low.",
+			})
+			return
+		}
+		savingInfo.Amount -= req.Amount
+		_, _ = a.svc.SavingDao.CreateOrUpdate(ctx, savingInfo)
+	} else {
+		checkingInfo, _ := a.svc.CheckingDao.GetChecking(ctx, req.FromAccountID)
+		if checkingInfo.Amount < req.Amount {
+			ctx.JSON(http.StatusOK, domain.Response{
+				Status:   7,
+				ErrorMsg: "The deposit of account is too low.",
+			})
+			return
+		}
+		checkingInfo.Amount -= req.Amount
+		_, _ = a.svc.CheckingDao.CreateOrUpdate(ctx, checkingInfo)
+	}
+
+	if accountToInfo.AccountType == "S" {
+		savingInfo, _ := a.svc.SavingDao.GetSaving(ctx, req.ToAccountID)
+		savingInfo.Amount += req.Amount
+		_, _ = a.svc.SavingDao.CreateOrUpdate(ctx, savingInfo)
+	} else {
+		checkingInfo, _ := a.svc.CheckingDao.GetChecking(ctx, req.ToAccountID)
+		checkingInfo.Amount += req.Amount
+		_, _ = a.svc.CheckingDao.CreateOrUpdate(ctx, checkingInfo)
+	}
+
+	_ = a.svc.TransactionDao.Create(ctx, dao.Transaction{
+		FromAccountID:   req.FromAccountID,
+		FromAccountName: accountInfo.Name,
+		ToAccountID:     req.ToAccountID,
+		ToAccountName:   accountToInfo.Name,
+		Amount:          req.Amount,
+	})
+
+	ctx.JSON(http.StatusOK, domain.Response{
+		Status:   0,
+		ErrorMsg: "",
+	})
+}
+
+func (a *AccountHandler) GetTransactions(ctx *gin.Context) {
+	type Req struct {
+		AccountID int64 `json:"account_id"`
+	}
+
+	var req Req
+
+	if err := ctx.Bind(&req); err != nil {
+		ctx.JSON(http.StatusOK, domain.Response{
+			Status:   -1,
+			ErrorMsg: "Args error",
+		})
+		return
+	}
+
+	transactions, _ := a.svc.TransactionDao.GetByAccountID(ctx, req.AccountID)
+	ctx.JSON(http.StatusOK, domain.Response{
+		Status:   0,
+		ErrorMsg: "",
+		Data:     transactions,
 	})
 }

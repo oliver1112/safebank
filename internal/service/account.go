@@ -12,14 +12,15 @@ import (
 )
 
 type AccountService struct {
-	UserRepo     *repository.UserRepository
-	AccountDao   *dao.AccountDAO
-	CheckingDao  *dao.CheckingDAO
-	HomeLoanDao  *dao.HomeLoanDAO
-	LoanDao      *dao.LoanDAO
-	SavingDao    *dao.SavingDAO
-	StuLoanDao   *dao.StuLoanDAO
-	InstituteDao *dao.InstituteDAO
+	UserRepo       *repository.UserRepository
+	AccountDao     *dao.AccountDAO
+	CheckingDao    *dao.CheckingDAO
+	HomeLoanDao    *dao.HomeLoanDAO
+	LoanDao        *dao.LoanDAO
+	SavingDao      *dao.SavingDAO
+	StuLoanDao     *dao.StuLoanDAO
+	InstituteDao   *dao.InstituteDAO
+	TransactionDao *dao.TransactionDAO
 }
 
 func NewAccountService(db *gorm.DB) *AccountService {
@@ -34,16 +35,18 @@ func NewAccountService(db *gorm.DB) *AccountService {
 	savingDao := dao.NewSavingDao(db)
 	stuLoanDao := dao.NewStuLoanDao(db)
 	instituteDao := dao.NewInstituteDao(db)
+	transactionDao := dao.NewTransactionDao(db)
 
 	return &AccountService{
-		UserRepo:     userRepo,
-		AccountDao:   accountDao,
-		CheckingDao:  checkingDao,
-		HomeLoanDao:  homeLoanDao,
-		LoanDao:      loanDao,
-		SavingDao:    savingDao,
-		StuLoanDao:   stuLoanDao,
-		InstituteDao: instituteDao,
+		UserRepo:       userRepo,
+		AccountDao:     accountDao,
+		CheckingDao:    checkingDao,
+		HomeLoanDao:    homeLoanDao,
+		LoanDao:        loanDao,
+		SavingDao:      savingDao,
+		StuLoanDao:     stuLoanDao,
+		InstituteDao:   instituteDao,
+		TransactionDao: transactionDao,
 	}
 }
 

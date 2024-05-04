@@ -12,5 +12,6 @@ func InitTable(db *gorm.DB) error {
 		&StuLoan{},
 		&HomeLoan{},
 		&Employee{},
+		&Transaction{},
 	)
 }
