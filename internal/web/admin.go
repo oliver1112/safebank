@@ -206,7 +206,7 @@ func (a *AdminHandler) DashBoard(ctx *gin.Context) {
 	var studentLoanAccountNum int64
 	var personalLoanAccountNum int64
 	type TotalSavingDeposit struct {
-		Total float64
+		Total int64
 	}
 	type TotalCheckingDeposit struct {
 		Total int64
@@ -233,8 +233,8 @@ func (a *AdminHandler) DashBoard(ctx *gin.Context) {
 	response["home_loan_account_num"] = homeLoanAccountNum
 	response["student_loan_account_num"] = studentLoanAccountNum
 	response["personal_loan_account_num"] = personalLoanAccountNum
-	response["total_saving_deposit"] = totalSavingDeposit.Total
-	response["total_checking_deposit"] = totalCheckingDeposit.Total
+	response["total_saving_deposit"] = totalSavingDeposit.Total / 100
+	response["total_checking_deposit"] = totalCheckingDeposit.Total / 100
 	response["total_loan_amount"] = totalLoanAmount.Total
 
 	ctx.JSON(http.StatusOK, domain.Response{
