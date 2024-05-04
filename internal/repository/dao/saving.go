@@ -14,7 +14,7 @@ type Saving struct {
 	AccountID    int64   `gorm:"primaryKey" json:"account_id"`
 	Account      Account `json:"account"`
 	InterestRate float64 `json:"interest_rate"`
-	Amount       float64 `json:"amount"`
+	Amount       int64   `json:"amount"`
 }
 
 func (Saving) TableName() string {

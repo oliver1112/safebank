@@ -142,7 +142,7 @@ func (a *AdminService) UpdateAccountInfo(ctx *gin.Context, AccountID int64, upda
 		}
 
 		if value, ok := updateData["amount"]; ok {
-			savingData.Amount = cast.ToFloat64(value)
+			savingData.Amount = cast.ToInt64(value)
 		}
 
 		savingData.Account = accountData
